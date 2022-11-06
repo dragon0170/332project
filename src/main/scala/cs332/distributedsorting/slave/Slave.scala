@@ -1,0 +1,51 @@
+package cs332.distributedsorting.slave
+
+import java.util.concurrent.TimeUnit
+import java.util.logging.{Level, Logger}
+import io.grpc.{ManagedChannel, ManagedChannelBuilder, StatusRuntimeException}
+
+import cs332.distributedsorting.example.{GreeterGrpc, HelloRequest}
+import cs332.distributedsorting.example.GreeterGrpc.GreeterBlockingStub
+
+object Slave {
+  def apply(host: String, port: Int): Slave = {
+    val channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[_]].build
+    val blockingStub = GreeterGrpc.blockingStub(channel)
+    new Slave(channel, blockingStub)
+  }
+
+  def main(args: Array[String]): Unit = {
+    val client = Slave("localhost", 50051)
+    try {
+      val user = args.headOption.getOrElse("world")
+      client.greet(user)
+    } finally {
+      client.shutdown()
+    }
+  }
+}
+
+class Slave private(
+  private val channel: ManagedChannel,
+  private val blockingStub: GreeterBlockingStub
+) {
+  private[this] val logger = Logger.getLogger(classOf[Slave].getName)
+
+  def shutdown(): Unit = {
+    channel.shutdown.awaitTermination(5, TimeUnit.SECONDS)
+  }
+
+  def greet(name: String): Unit = {
+    logger.info("Will try to greet " + name + " ...")
+    val request = HelloRequest(name = name)
+    try {
+      val response = blockingStub.sayHello(request)
+      logger.info("Greeting: " + response.message)
+    }
+    catch {
+      case e: StatusRuntimeException =>
+        logger.log(Level.WARNING, "RPC failed: {0}", e.getStatus)
+    }
+  }
+}
+

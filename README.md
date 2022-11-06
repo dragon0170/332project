@@ -1,5 +1,17 @@
 # 332project
 
+## Build
+This command compiles protobuf file to scala class.
+```shell
+sbt compile
+```
+
+## Installation
+
+```shell
+sbt stage
+```
+
 ## Weekly Progress
 
 ### Progress of week 1
