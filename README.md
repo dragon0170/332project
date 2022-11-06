@@ -87,3 +87,28 @@ sbt stage
 - master waits and prints the list of slaves’ ip address
 - send ip address from slaves to master
 
+---
+
+### Progress of week 3
+
+- set up the basic scala project
+- implement master, slave app with grpc communication
+- send ip address from slaves to master
+- master stores ip address of slaves
+
+### Goal of week 4, 최규용
+
+- master waits slaves’ connection until the number of established connections is same as argv number
+  - If all connections are established, master prints the list of slaves’ ip address
+- set up testing automation for master, slave
+
+### Goal of week 4, 김수빈
+
+- print master’s ip and port
+- connect slave to master with argv master ip address and port
+- master should partition the ranges and send back to slave for key ranges
+
+### Goal of week 4, Mathis
+
+- load the files in the directory of argv -I option from the disk
+- each worker samples data from the files and send to master
