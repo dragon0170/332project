@@ -12,6 +12,28 @@ sbt compile
 sbt stage
 ```
 
+## Milestones
+
+### #1(~11/7)
+
+- Generate unsorted data files
+- Learn grpc
+- Slave connects to Master with grpc
+
+### #2(~11/13)
+
+- Sample data from the file in each worker.
+- Master determines and broadcasts sorting key ranges for each worker.
+
+### #3(~11/20)
+
+- Sort input files in each worker and save the sorted results into partitioned files with appropriate key ranges.
+
+### #4(~12/4)
+
+- Shuffle the sorted files with each other.
+- Merge all sorted files in each worker and save into partitioned files with appropriate size.
+
 ## Weekly Progress
 
 ### Progress of week 1
