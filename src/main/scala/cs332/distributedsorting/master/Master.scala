@@ -3,7 +3,7 @@ package cs332.distributedsorting.master
 import java.util.logging.Logger
 import io.grpc.{Server, ServerBuilder}
 
-import cs332.distributedsorting.example.{GreeterGrpc, HelloReply, HelloRequest}
+import cs332.distributedsorting.example.{GreeterGrpc, HelloReply, HelloIpAdress}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,12 +16,15 @@ object Master {
     server.blockUntilShutdown()
   }
 
-  private val port = 50051
+  private val port = 50062
 }
 
 
 class Master(executionContext: ExecutionContext) { self =>
   private[this] var server: Server = null
+  private var clients: Map[String, String] = Map();
+  
+
 
   private def start(): Unit = {
     server = ServerBuilder.forPort(Master.port).addService(GreeterGrpc.bindService(new GreeterImpl, executionContext)).build.start
@@ -31,6 +34,7 @@ class Master(executionContext: ExecutionContext) { self =>
       self.stop()
       System.err.println("*** server shut down")
     }
+
   }
 
   private def stop(): Unit = {
@@ -46,10 +50,13 @@ class Master(executionContext: ExecutionContext) { self =>
   }
 
   private class GreeterImpl extends GreeterGrpc.Greeter {
-    override def sayHello(req: HelloRequest) = {
+    override def makeContact(req: HelloIpAdress) = {
       Master.logger.info("Hello from " + req.name)
+      Master.logger.info("Get the Ip adress of " + req.name + "Ip adress is " + req.ipadress)
+      clients = clients +(req.name -> req.ipadress)
       val reply = HelloReply(message = "Hello " + req.name)
       Future.successful(reply)
+
     }
   }
 

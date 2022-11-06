@@ -1,10 +1,11 @@
 package cs332.distributedsorting.slave
 
 import java.util.concurrent.TimeUnit
+import java.net._
 import java.util.logging.{Level, Logger}
 import io.grpc.{ManagedChannel, ManagedChannelBuilder, StatusRuntimeException}
 
-import cs332.distributedsorting.example.{GreeterGrpc, HelloRequest}
+import cs332.distributedsorting.example.{GreeterGrpc, HelloIpAdress}
 import cs332.distributedsorting.example.GreeterGrpc.GreeterBlockingStub
 
 object Slave {
@@ -15,10 +16,12 @@ object Slave {
   }
 
   def main(args: Array[String]): Unit = {
-    val client = Slave("localhost", 50051)
+    val client = Slave("localhost", 50061)
     try {
       val user = args.headOption.getOrElse("world")
-      client.greet(user)
+      val localhost: InetAddress = InetAddress.getLocalHost
+      val localIpAddress: String = localhost.getHostAddress
+      client.sendMyIp(user, localIpAddress)
     } finally {
       client.shutdown()
     }
@@ -35,11 +38,11 @@ class Slave private(
     channel.shutdown.awaitTermination(5, TimeUnit.SECONDS)
   }
 
-  def greet(name: String): Unit = {
+  def sendMyIp(name: String, ip : String): Unit = {
     logger.info("Will try to greet " + name + " ...")
-    val request = HelloRequest(name = name)
+    val request = HelloIpAdress(ipadress = ip, name = name)
     try {
-      val response = blockingStub.sayHello(request)
+      val response = blockingStub.makeContact(request)
       logger.info("Greeting: " + response.message)
     }
     catch {
