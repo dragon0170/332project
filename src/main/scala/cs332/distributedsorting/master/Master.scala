@@ -12,13 +12,19 @@ object Master {
 
   def main(args: Array[String]): Unit = {
     val server = new Master(ExecutionContext.global)
-    server.start()
-    server.blockUntilShutdown()
+    try {
+      val slave_num = args.toInt
+      val localhost: InetAddress = InetAddress.getLocalHost
+      val localIpAddress: String = localhost.getHostAddress
+      server.start()
+      server.printMasterIP(slave_num, localIpAddress)
+    } finally {
+      server.blockUntilShutdown()
+    }
   }
 
-  private val port = 50051
+  private val port = 50062
 }
-
 
 class Master(executionContext: ExecutionContext) { self =>
   private[this] var server: Server = null
@@ -45,6 +51,16 @@ class Master(executionContext: ExecutionContext) { self =>
     }
   }
 
+  private def printMasterIP(slave_num: Int, ip: String): Unit = {
+    if (server != null) {
+      System.out.println("Master IP: " ip + Master.port)
+      for{
+        i <- 1 to slave_num
+        client <- clients
+      }yield System.out.println("Worker IP #" + i + ": " client._2)
+    }
+  }
+  
   private class GreeterImpl extends GreeterGrpc.Greeter {
     override def sayHello(req: HelloRequest) = {
       Master.logger.info("Hello from " + req.name)
