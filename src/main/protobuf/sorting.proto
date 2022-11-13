@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package cs332.distributedsorting;
+
+service Sorting {
+  rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
+  rpc SendData(SendDataRequest)returns (SendDataResponse){}
+}
+
+
+message SendDataRequest{
+  string data = 1;
+  string ipAddress = 2;
+}
+
+message SendDataResponse{
+  bool ok = 1;
+}
+
+message HandshakeRequest {
+  string ipAddress = 1;
+}
+
+message HandshakeResponse {
+  bool ok = 1;
+}
