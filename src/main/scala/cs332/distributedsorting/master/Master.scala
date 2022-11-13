@@ -63,12 +63,16 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   }
 
 
-  private def addData(data : String) : Unit = {
+  private def addData(data : String,ipAddress : String) : Boolean = {
     this.synchronized({
+      if (slaves.filter(x=>x.ip == ipAddress).isEmpty)
+        System.out.println("we receive data from a client we did not register")
+        return false 
       count +=1
       this.data :+ data.getBytes().grouped(10).toList
       if(count == numClient)
         System.out.println("we receive all the data")
+      return true
     })
   }
 
@@ -86,6 +90,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   }
 
   private class SortingImpl extends SortingGrpc.Sorting {
+
     override def handshake(req: HandshakeRequest) = {
       Master.logger.info("Handshake from " + req.ipAddress)
       clientLatch.countDown()
@@ -97,7 +102,8 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
     override def sendData(req : SendDataRequest) = {
       Master.logger.info("recup data from " + req.ipAddress)
       clientLatch.countDown()
-      addData(req.data)
+      addData(req.data,req.ipAddress)
+      // what to do if a new client send data
       clientLatch.await()
       val reply = SendDataResponse(ok = true)
       Future.successful(reply)
