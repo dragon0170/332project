@@ -113,6 +113,8 @@ sbt stage
 - load the files in the directory of argv -I option from the disk
 - each worker samples data from the files and send to master
 
+---
+
 ### Progress of week 4
 
 - Implement handshaking feature between master and slave
