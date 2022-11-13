@@ -112,3 +112,26 @@ sbt stage
 
 - load the files in the directory of argv -I option from the disk
 - each worker samples data from the files and send to master
+
+### Progress of week 4
+
+- Implement handshaking feature between master and slave
+  - flow diagram - [https://drive.google.com/file/d/1NAOFlg2oOSw5aHK3nLS4VR87bHtnB8Ry/view?usp=sharing](https://drive.google.com/file/d/1NAOFlg2oOSw5aHK3nLS4VR87bHtnB8Ry/view?usp=sharing)
+  - print master’s ip and port
+  - connect slave to master with argv master ip address and port
+  - master waits slaves’ connection until the number of established connections is same as argv number
+    - If all connections are established, master prints the list of slaves’ ip address
+- Get a file from the disk and send data of the file as string with grpc from slave to master
+
+### Goal of week 5, 최규용
+
+- Add logging system
+- Design distributed sorting system and architecture of master, slave roughly
+- Set up testing automation for master, slave
+
+### Goal of week 5, 김수빈
+
+### Goal of week 5, Mathis
+
+- Load whole files in the directory with argv -I option from the disk
+- Sort one file and save the sorted result into another file
