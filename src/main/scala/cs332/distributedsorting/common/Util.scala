@@ -10,13 +10,14 @@ object Util {
       socket.getLocalAddress.getHostAddress
     } finally if (socket != null) socket.close()
   }
-
-  def compareKeys(a:String, b: String):Boolean ={
-		assert(a.length() == b.length())
+}
+object KeyOrdering extends Ordering[Array[Byte]]{
+  override def compare(a:Array[Byte], b: Array[Byte]):Int ={
+		assert(a.length == b.length)
 		for (i<- 0 to 9 ){
-			if(a(i)>b(i)) return true
-			if(a(i) < b(i)) return false
+			if(a(i)>b(i)) return 1
+			if(a(i) < b(i)) return -1
 		}
-		return true
+		return 0
   }
 }

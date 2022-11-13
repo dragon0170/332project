@@ -4,6 +4,8 @@ import java.util.logging.Logger
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SortingGrpc,SendDataRequest, SendDataResponse}
 import cs332.distributedsorting.common.Util.getMyIpAddress
+import cs332.distributedsorting.common.KeyOrdering
+import scala.collection.Map
 
 import java.util.concurrent.CountDownLatch
 import scala.concurrent.{ExecutionContext, Future}
@@ -76,6 +78,20 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
     })
   }
 
+  private def createPartition(): Map[(String, (Int, Int))] = {
+    val mindata = data.min(KeyOrdering)
+    val maxdata = data.max(KeyOrdering)
+    var partition = map()
+    val range = (maxdata -mindata)/count
+    var loop  = 0
+    for (slave <- slaves ){
+      partiton :+ (slave ->(mindata + loop*range, mindata + (loop+1)*range))
+      loop+=1
+    }
+    return partition
+  }
+
+
   private def addNewSlave(ipAddress: String): Unit = {
     this.synchronized {
       this.slaves = this.slaves :+ new SlaveClient(this.slaves.length, ipAddress)
@@ -105,6 +121,9 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
       addData(req.data,req.ipAddress)
       // what to do if a new client send data
       clientLatch.await()
+      // we have to reply with partition
+      val parition = createPartition()
+      
       val reply = SendDataResponse(ok = true)
       Future.successful(reply)
 

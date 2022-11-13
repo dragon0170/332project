@@ -9,12 +9,20 @@ service Sorting {
 
 
 message SendDataRequest{
-  string data = 1;
-  string ipAddress = 2;
+  String data = 1;
+  string partition = 2;
+}
+
+
+message Range {
+  int lowerbound = 1;
+  int upperbound = 2;
 }
 
 message SendDataResponse{
   bool ok = 1;
+  map<string,Range> partition = 2;
+
 }
 
 message HandshakeRequest {
