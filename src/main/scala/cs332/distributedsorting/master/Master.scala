@@ -2,10 +2,11 @@ package cs332.distributedsorting.master
 
 import java.util.logging.Logger
 import io.grpc.{Server, ServerBuilder}
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SortingGrpc,SendDataRequest, SendDataResponse}
-import cs332.distributedsorting.common.Util.getMyIpAddress
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SortingGrpc,SendDataRequest, SendDataResponse, Part}
+import cs332.distributedsorting.common.Util.{getMyIpAddress,sub,add,div,mult}
+
 import cs332.distributedsorting.common.KeyOrdering
-import scala.collection.Map
+import scala.collection.immutable.Map
 
 import java.util.concurrent.CountDownLatch
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,6 +36,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   private val clientLatch: CountDownLatch = new CountDownLatch(numClient)
   var slaves: Vector[SlaveClient] = Vector.empty
   var data : List[Array[Byte]] = Nil
+  var partition : Map[String,(Array[Byte], Array[Byte])] = Map.empty
   var count = 0
 
   private def start(): Unit = {
@@ -78,14 +80,13 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
     })
   }
 
-  private def createPartition(): Map[(String, (Int, Int))] = {
+  private def createPartition(): Map[String, (Array[Byte], Array[Byte])] = {
     val mindata = data.min(KeyOrdering)
     val maxdata = data.max(KeyOrdering)
-    var partition = map()
-    val range = (maxdata -mindata)/count
+    val range = div(count, sub(maxdata,mindata))
     var loop  = 0
     for (slave <- slaves ){
-      partiton :+ (slave ->(mindata + loop*range, mindata + (loop+1)*range))
+      partition += (slave.toString ->(add(mindata, mult(loop,range)), add(mindata, mult(loop+1,range))))
       loop+=1
     }
     return partition
@@ -122,9 +123,8 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
       // what to do if a new client send data
       clientLatch.await()
       // we have to reply with partition
-      val parition = createPartition()
-      
-      val reply = SendDataResponse(ok = true)
+      val temp : Map[String, Part] = createPartition().map(x=>(x._1,Part(lowerbound = x._2._1.toString,upperbound = x._2._2.toString)))
+      val reply = SendDataResponse(ok = true, partition = temp)
       Future.successful(reply)
 
     }

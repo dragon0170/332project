@@ -80,6 +80,7 @@ class Slave private(
     try {
       val response = blockingStub.sendData(request)
       logger.info("Data send : " + response.ok)
+      logger.info(" partition for data are :" + response.partition)
     }
     catch {
       case e : StatusRuntimeException => 

@@ -9,19 +9,19 @@ service Sorting {
 
 
 message SendDataRequest{
-  String data = 1;
-  string partition = 2;
+  string data = 1;
+  string ipAddress= 2;
 }
 
 
-message Range {
-  int lowerbound = 1;
-  int upperbound = 2;
+message Part {
+  string lowerbound = 1; // corresponds to Array of Bytes
+  string upperbound = 2; // corresponds to Array of Bytes
 }
 
 message SendDataResponse{
   bool ok = 1;
-  map<string,Range> partition = 2;
+  map<string,Part> partition = 2;
 
 }
 
