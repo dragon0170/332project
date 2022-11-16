@@ -41,7 +41,7 @@ object Slave {
       else{
         System.out.println("Try to send data to master")
         val fSource = Source.fromFile(args(0))
-        val keyList = (fSource.grouped(100).map(x=>x.dropRight(90))).take(100000).toString() // list of key (size is 1GB)
+        val keyList = (fSource.grouped(100).map(x=>x.dropRight(90))).take(10000).toString() // list of key (size is 1GB)
         try{
           client.sendData(keyList)
         }finally{
