@@ -1,5 +1,10 @@
 # 332project
 
+## Requirements
+- JDK v1.8.0
+- Scala v2.13.10
+- sbt v1.7.3
+
 ## Build
 This command compiles protobuf file to scala class.
 ```shell
