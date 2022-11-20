@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
   "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
   "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
   "org.apache.logging.log4j" %% "log4j-api-scala" % "12.0",
-  "org.apache.logging.log4j" % "log4j-core" % "2.19.0" % Runtime
+  "org.apache.logging.log4j" % "log4j-core" % "2.19.0" % Runtime,
+  "org.scalatest" %% "scalatest" % "3.2.14" % "test"
 )
 
 Compile / PB.targets := Seq(
