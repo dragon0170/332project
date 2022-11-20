@@ -1,6 +1,6 @@
 package cs332.distributedsorting.master
 
-import java.util.logging.Logger
+import org.apache.logging.log4j.scala.Logging
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SortingGrpc}
 import cs332.distributedsorting.common.Util.getMyIpAddress
@@ -9,8 +9,6 @@ import java.util.concurrent.CountDownLatch
 import scala.concurrent.{ExecutionContext, Future}
 
 object Master {
-  private val logger = Logger.getLogger(classOf[Master].getName)
-
   def main(args: Array[String]): Unit = {
     val numClient = args.headOption
     if (numClient.isEmpty) return
@@ -28,15 +26,15 @@ class SlaveClient(val id: Int, val ip: String) {
   override def toString: String = ip
 }
 
-class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
+class Master(executionContext: ExecutionContext, val numClient: Int) extends Logging { self =>
   private[this] var server: Server = null
   private val clientLatch: CountDownLatch = new CountDownLatch(numClient)
   var slaves: Vector[SlaveClient] = Vector.empty
 
   private def start(): Unit = {
     server = ServerBuilder.forPort(Master.port).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
-    Master.logger.info("Server numClient: " + self.numClient)
-    Master.logger.info("Server started, listening on " + Master.port)
+    logger.info("Server numClient: " + self.numClient)
+    logger.info("Server started, listening on " + Master.port)
     sys.addShutdownHook {
       System.err.println("*** shutting down gRPC server since JVM is shutting down")
       self.stop()
@@ -45,7 +43,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   }
 
   private def printEndpoint(): Unit = {
-    System.out.println(getMyIpAddress() + ":" + Master.port)
+    System.out.println(getMyIpAddress + ":" + Master.port)
   }
 
   private def stop(): Unit = {
@@ -73,7 +71,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
 
   private class SortingImpl extends SortingGrpc.Sorting {
     override def handshake(req: HandshakeRequest) = {
-      Master.logger.info("Handshake from " + req.ipAddress)
+      logger.info("Handshake from " + req.ipAddress)
       clientLatch.countDown()
       addNewSlave(req.ipAddress)
       clientLatch.await()
