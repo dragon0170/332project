@@ -180,4 +180,3 @@ sbt stage
 - Finish implementing the paritioning part in master application
 - Add test code for partitioning job
 - Assignment NodeScala
-- 
