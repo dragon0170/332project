@@ -1,12 +1,14 @@
 package cs332.distributedsorting.slave
 
-import cs332.distributedsorting.common.Util.getMyIpAddress
+import cs332.distributedsorting.common.Util
 import scala.io.Source 
 import java.util.concurrent.TimeUnit
 import java.util.logging.{Level, Logger}
 import io.grpc.{ManagedChannel, ManagedChannelBuilder, StatusRuntimeException}
 import cs332.distributedsorting.sorting.{HandshakeRequest, SortingGrpc, SendDataRequest, SendDataResponse}
 import cs332.distributedsorting.sorting.SortingGrpc.SortingBlockingStub
+
+import com.google.code.externalsorting.ExternalSort  //to enable externalsortinjava
 
 object Slave {
   def apply(host: String, port: Int): Slave = {
@@ -17,6 +19,8 @@ object Slave {
 
   def main(args: Array[String]): Unit = {
     val masterEndpoint = args.headOption
+    val inputDirList:List[String] = List()
+    val outputDirList:List[String] = List()
     if (masterEndpoint.isEmpty)
       System.out.println("Master ip:port argument is empty.")
     else {
@@ -25,28 +29,44 @@ object Slave {
       val client = Slave(splitedEndpoint(0), splitedEndpoint(1).toInt)
       try {
         client.handshake()
-      }
+       }
       catch{
         case e : Exception => {
           client.shutdown()
           return
-        }
-      }
+         }
+       }
         // suppose args(1) is  the path to data file generated with gensort
       val path = args.lastOption
       if (path.isEmpty){
         System.out.println("Path to data file is empty.")
         client.shutdown()
-      }
+       }
       else{
-        System.out.println("Try to send data to master")
-        val fSource = Source.fromFile(args(0))
-        val keyList = (fSource.grouped(100).map(x=>x.dropRight(90))).take(10000).toString() // list of key (size is 1GB)
-        try{
-          client.sendData(keyList)
-        }finally{
+        var counter = 0    //argv option to get directory path
+        for(arg <- path){
+          if(arg == "-I" || arg == "-i")
+            counter = 1
+          else if(arg == "-O" || arg == "-o")
+            counter = 2
+          else
+            if(counter == 1)
+              inputDirList :+ arg
+            else if(counter == 2)
+              outputDirList :+ arg
+         }
+       }
+      
+      externalSort(inputDirList, outputDirList.headOption)
+      
+      System.out.println("Try to send data to master")
+      val fSource = Source.fromFile(args(0))
+      val keyList = (fSource.grouped(100).map(x=>x.dropRight(90))).take(10000).toString() // list of key (size is 1GB)
+      try{
+        client.sendData(keyList)
+      }finally{
         client.shutdown()
-        }
+       }
       }
     }
   }

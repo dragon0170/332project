@@ -1,6 +1,8 @@
 package cs332.distributedsorting.common
 
 import java.net.{DatagramSocket, InetAddress}
+import com.google.code.externalsorting.ExternalSort  //to enable externalsortinjava
+import java.io.File
 import scala.math.BigInt
 
 
@@ -11,6 +13,27 @@ object Util {
       socket.connect(InetAddress.getByName("8.8.8.8"), 10002)
       socket.getLocalAddress.getHostAddress
     } finally if (socket != null) socket.close()
+  }
+  
+  def getListOfFiles(dir: String): List[File] = {
+    def go(dir: File): List[File] = dir match {
+      case d if d.exists && d.isDirectory && d.canRead=>
+        val files = d.listFiles.filter(a => a.canRead && a.isFile).toList
+        val dirs  = dir.listFiles.filter(_.isDirectory).toList
+        files ::: dirs.foldLeft(List.empty[File])(_ ::: go(_))
+      case _ => List.empty[File]
+    }
+    go(new File(dir))
+  }
+  
+  def externalSort(dirList:List[String], outputDir:String): Unit = {
+    val sortedInputFileList:List[File] = for(inputFileDir <- dirList){
+      for(inputFile <- getListOfFiles(inputFileDir)){
+        ExternalSort.sort​(inputFile, inputFile)
+      }
+    }yield inputFile
+    
+    ExternalSort.mergeSortedFiles(sortedInputFileList:List[File], new File(outputDir + "whole"));
   }
   
   def sub(a:Array[Byte], b : Array[Byte]):Array[Byte] = {
