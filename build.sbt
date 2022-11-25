@@ -11,7 +11,8 @@ enablePlugins(JavaAppPackaging)
 
 libraryDependencies ++= Seq(
   "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
-  "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
+  "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
+  "org.scalatest" %% "scalatest" % "3.2.14" % "test"
 )
 
 Compile / PB.targets := Seq(

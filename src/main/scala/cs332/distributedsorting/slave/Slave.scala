@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import java.util.logging.{Level, Logger}
 import com.google.protobuf.ByteString
 import io.grpc.{ManagedChannel, ManagedChannelBuilder, StatusRuntimeException}
-import cs332.distributedsorting.sorting.{HandshakeRequest, SortingGrpc, SendDataRequest, SendDataResponse}
+import cs332.distributedsorting.sorting.{HandshakeRequest, SortingGrpc, SendDataRequest, SendDataResponse, Part}
 import cs332.distributedsorting.sorting.SortingGrpc.SortingBlockingStub
 
 object Slave {
@@ -57,7 +57,9 @@ object Slave {
 class Slave private(
   private val channel: ManagedChannel,
   private val blockingStub: SortingBlockingStub
-) {
+)
+ {
+  var partition: Map[String, (Array[Byte], Array[Byte])] = Map.empty
   private[this] val logger = Logger.getLogger(classOf[Slave].getName)
 
   def shutdown(): Unit = {
@@ -79,9 +81,13 @@ class Slave private(
   def sendData(data :Array[Byte]) : Unit = {
     val request = SendDataRequest(ipAddress = getMyIpAddress, data = ByteString.copyFrom(data))
     try {
-      val response = blockingStub.sendData(request)
-      logger.info("Data send : " + response.ok)
-      logger.info(" partition for data are :" + response.partition)
+      val response: SendDataResponse = blockingStub.sendData(request)
+      if (response.ok){
+        this.partition = response.partition.map(x=> (x._1, (x._2.lowerbound.toByteArray(), x._2.upperbound.toByteArray())))
+      }
+      else {
+        logger.info("master does not succeed to create a partition")
+      }
     }
     catch {
       case e : StatusRuntimeException => 
