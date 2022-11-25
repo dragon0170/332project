@@ -9,14 +9,14 @@ service Sorting {
 
 
 message SendDataRequest{
-  string data = 1;
+  bytes data = 1;
   string ipAddress= 2;
 }
 
 
 message Part {
-  string lowerbound = 1; // corresponds to Array of Bytes
-  string upperbound = 2; // corresponds to Array of Bytes
+  bytes lowerbound = 1; // corresponds to Array of Bytes
+  bytes upperbound = 2; // corresponds to Array of Bytes
 }
 
 message SendDataResponse{

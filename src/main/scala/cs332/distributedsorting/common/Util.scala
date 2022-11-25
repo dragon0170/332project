@@ -12,7 +12,8 @@ object Util {
       socket.getLocalAddress.getHostAddress
     } finally if (socket != null) socket.close()
   }
-  
+}
+  /*
   def sub(a:Array[Byte], b : Array[Byte]):Array[Byte] = {
     assert(a.length == b.length)
     val aInt = BigInt(a)
@@ -55,7 +56,7 @@ object Util {
     return mult(1/a,b)
   }
 }
-
+*/
 
   
   

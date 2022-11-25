@@ -4,6 +4,7 @@ import cs332.distributedsorting.common.Util.getMyIpAddress
 import scala.io.Source 
 import java.util.concurrent.TimeUnit
 import java.util.logging.{Level, Logger}
+import com.google.protobuf.ByteString
 import io.grpc.{ManagedChannel, ManagedChannelBuilder, StatusRuntimeException}
 import cs332.distributedsorting.sorting.{HandshakeRequest, SortingGrpc, SendDataRequest, SendDataResponse}
 import cs332.distributedsorting.sorting.SortingGrpc.SortingBlockingStub
@@ -41,7 +42,7 @@ object Slave {
       else{
         System.out.println("Try to send data to master")
         val fSource = Source.fromFile(args(0))
-        val keyList = (fSource.grouped(100).map(x=>x.dropRight(90))).take(10000).toString() // list of key (size is 1GB)
+        val keyList = (fSource.grouped(100).map(x=>x.dropRight(90))).take(10000).flatten.toArray.map(x=>x.toByte)
         try{
           client.sendData(keyList)
         }finally{
@@ -75,8 +76,8 @@ class Slave private(
       }
   }
 
-  def sendData(data : String) : Unit = {
-    val request = SendDataRequest(ipAddress = getMyIpAddress, data = data)
+  def sendData(data :Array[Byte]) : Unit = {
+    val request = SendDataRequest(ipAddress = getMyIpAddress, data = ByteString.copyFrom(data))
     try {
       val response = blockingStub.sendData(request)
       logger.info("Data send : " + response.ok)

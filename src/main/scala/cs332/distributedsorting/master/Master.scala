@@ -3,10 +3,10 @@ package cs332.distributedsorting.master
 import java.util.logging.Logger
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SortingGrpc,SendDataRequest, SendDataResponse, Part}
-import cs332.distributedsorting.common.Util.{getMyIpAddress,sub,add,div,mult}
-
+import cs332.distributedsorting.common.Util.{getMyIpAddress}
+import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
-import scala.collection.immutable.Map
+import scala.collection.mutable.Map
 
 import java.util.concurrent.CountDownLatch
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,13 +67,13 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   }
 
 
-  private def addData(data : String,ipAddress : String) : Boolean = {
+  private def addData(data : Array[Byte],ipAddress : String) : Boolean = {
     this.synchronized({
       if (slaves.filter(x=>x.ip == ipAddress).isEmpty)
         System.out.println("we receive data from a client we did not register")
         return false 
       count +=1
-      this.data :+ data.getBytes().grouped(10).toList
+      this.data :+ data.grouped(10).toList
       if(count == numClient)
         System.out.println("we receive all the data")
       return true
@@ -81,15 +81,26 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   }
 
   private def createPartition(): Map[String, (Array[Byte], Array[Byte])] = {
-    val mindata = data.min(KeyOrdering)
-    val maxdata = data.max(KeyOrdering)
-    val range = div(count, sub(maxdata,mindata))
-    var loop  = 0
-    for (slave <- slaves ){
-      partition += (slave.toString ->(add(mindata, mult(loop,range)), add(mindata, mult(loop+1,range))))
-      loop+=1
+    val mindata : Array[Byte] = Array(0,0,0,0,0,0,0,0,0,0)
+    val maxdata : Array[Byte] = Array(-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7)
+    // we first need to sort the data list
+    this.data.sorted(KeyOrdering)
+    // then we can create the partiton
+    val range:Int =(data.length/count) 
+    var loop = 0
+    for (slave <- slaves){
+      if (loop == 0){
+        this.partition.put(slave.toString(), (mindata, data((loop+1)*range)))
+      }
+      if (loop == count - 1){
+        this.partition.put(slave.toString(), (data(loop*range), maxdata))
+      }
+      else{
+        this.partition.put(slave.toString(), (data(loop*range), data((loop+1)*range)))
+      } 
+      loop +=1
     }
-    return partition
+    return this.partition
   }
 
 
@@ -116,15 +127,18 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
       val reply = HandshakeResponse(ok = true)
       Future.successful(reply)
     }
+
+
     override def sendData(req : SendDataRequest) = {
       Master.logger.info("recup data from " + req.ipAddress)
+      // do we have to restart the clientLatch 
       clientLatch.countDown()
-      addData(req.data,req.ipAddress)
+      addData(req.data.toByteArray(),req.ipAddress)
       // what to do if a new client send data
       clientLatch.await()
       // we have to reply with partition
-      val temp : Map[String, Part] = createPartition().map(x=>(x._1,Part(lowerbound = x._2._1.toString,upperbound = x._2._2.toString)))
-      val reply = SendDataResponse(ok = true, partition = temp)
+      val temp :Map[String,Part] = createPartition().map(x=>(x._1,Part(lowerbound = ByteString.copyFrom(x._2._1),upperbound = ByteString.copyFrom(x._2._2))))
+      val reply = SendDataResponse(ok = true, partition = temp.toMap)
       Future.successful(reply)
 
     }
