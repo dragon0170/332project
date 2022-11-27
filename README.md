@@ -17,6 +17,18 @@ sbt compile
 sbt stage
 ```
 
+## Test
+### SBT Test
+```shell
+sbt test
+```
+
+### Docker Integration Test
+```shell
+./docker.sh
+```
+
+
 ## Milestones
 
 ### #1(~11/7)

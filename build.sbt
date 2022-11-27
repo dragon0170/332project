@@ -8,6 +8,7 @@ lazy val root = (project in file("."))
   )
 
 enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
 
 libraryDependencies ++= Seq(
   "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
