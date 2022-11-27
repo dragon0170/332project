@@ -180,3 +180,35 @@ sbt stage
 - Finish implementing the paritioning part in master application
 - Add test code for partitioning job
 - Assignment NodeScala
+
+---
+
+### Progress of week 6
+
+Not much progress than previous week because of the last assignment.
+
+- Partitioning job - [https://github.com/dragon0170/332project/pull/5](https://github.com/dragon0170/332project/pull/5)
+  - change type from string to bytes in protobuf SendDataRequest
+  - fix bugs of paritioning key ranges in master
+- Add automated testing - [https://github.com/dragon0170/332project/pull/8](https://github.com/dragon0170/332project/pull/8)
+  - set up master, slave testing automation with docker compose
+  - set up CI(Continuous Integration) with Github Actions
+  - fix bugs of grpc blocking stub at linux environments
+
+### Goal of week 7, 최규용
+
+- Design detailed messages and procedure for distributed sort
+- Review and merge the partitioning pull request and test with gensort files on docker environments
+- Add skeleton code for shuffling job(set up grpc server at slave, define sequence of function calls)
+
+### Goal of week 7, 김수빈
+
+- Finish implementing external sorting
+  - Add test code
+  - Save partitioned output files in the output directory
+- Review the detailed design of distributed sort
+
+### Goal of week 7, Mathis
+
+- Add test code for partitioning job and merge the partitioning pull request
+- Review the detailed design of distributed sort
