@@ -33,6 +33,7 @@ object Slave {
           return
         }
       }
+      System.out.println("handshake")
         // suppose args(1) is  the path to data file generated with gensort
       val path = args.lastOption
       if (path.isEmpty){
@@ -41,8 +42,8 @@ object Slave {
       }
       else{
         System.out.println("Try to send data to master")
-        val fSource = Source.fromFile(args(0))
-        val keyList = (fSource.grouped(100).map(x=>x.dropRight(90))).take(10000).flatten.toArray.map(x=>x.toByte)
+        val fSource = Source.fromFile(path.get)
+        val keyList = fSource.grouped(100).toList.map(x=>x.dropRight(90)).take(10).map(x=>x.map(y=>y.toByte)).flatten.toArray
         try{
           client.sendData(keyList)
         }finally{
@@ -80,10 +81,12 @@ class Slave private(
 
   def sendData(data :Array[Byte]) : Unit = {
     val request = SendDataRequest(ipAddress = getMyIpAddress, data = ByteString.copyFrom(data))
+    System.out.println("we have send data")
     try {
       val response: SendDataResponse = blockingStub.sendData(request)
       if (response.ok){
         this.partition = response.partition.map(x=> (x._1, (x._2.lowerbound.toByteArray(), x._2.upperbound.toByteArray())))
+        System.out.println(partition)
       }
       else {
         logger.info("master does not succeed to create a partition")

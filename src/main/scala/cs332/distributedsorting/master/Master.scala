@@ -7,6 +7,7 @@ import cs332.distributedsorting.common.Util.{getMyIpAddress}
 import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
 import scala.collection.mutable.Map
+import scala.sys._
 
 import java.util.concurrent.CountDownLatch
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,7 +25,7 @@ object Master {
     server.blockUntilShutdown()
   }
 
-  private val port = 50051
+  private val port = 5116
 }
 
 class SlaveClient(val id: Int, val ip: String) {
@@ -33,6 +34,7 @@ class SlaveClient(val id: Int, val ip: String) {
 
 class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   private[this] var server: Server = null
+  private val clientLatchSendData :CountDownLatch = new CountDownLatch(numClient)
   private val clientLatch: CountDownLatch = new CountDownLatch(numClient)
   var slaves: Vector[SlaveClient] = Vector.empty
   var data : List[Array[Byte]] = Nil
@@ -67,13 +69,15 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   }
 
 
-  private def addData(data : Array[Byte],ipAddress : String) : Boolean = {
+  private def addData(data_ : Array[Byte],ipAddress : String) : Boolean = {
     this.synchronized({
-      if (slaves.filter(x=>x.ip == ipAddress).isEmpty)
-        System.out.println("we receive data from a client we did not register")
-        return false 
-      count +=1
-      this.data :+ data.grouped(10).toList
+      /*if (this.slaves.toList.filter(x =>x.ip == ipAddress).isEmpty)
+      Master.logger.info("we receive data from a client we did not register")
+        return false*/
+      this.count +=1
+      this.data = this.data ++ data_.grouped(10).toList
+      System.out.println(this.data.length)
+      Master.logger.info("count is : " + count.toString())
       if(count == numClient)
         System.out.println("we receive all the data")
       return true
@@ -81,22 +85,23 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   }
 
   private def createPartition(): Map[String, (Array[Byte], Array[Byte])] = {
+    assert(this.count == this.numClient)
     val mindata : Array[Byte] = Array(0,0,0,0,0,0,0,0,0,0)
     val maxdata : Array[Byte] = Array(-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7,-2^7)
     // we first need to sort the data list
     this.data.sorted(KeyOrdering)
     // then we can create the partiton
-    val range:Int =(data.length/count) 
+    val range:Int =(data.length/this.count) 
     var loop = 0
-    for (slave <- slaves){
+    for (slave <- this.slaves.toList){
       if (loop == 0){
-        this.partition.put(slave.toString(), (mindata, data((loop+1)*range)))
+        this.partition.put(slave.toString(), (mindata, this.data((loop+1)*range -1)))
       }
-      if (loop == count - 1){
-        this.partition.put(slave.toString(), (data(loop*range), maxdata))
+      else if (loop == count-1){
+        this.partition.put(slave.toString(), (data((loop)*range -1), maxdata))
       }
       else{
-        this.partition.put(slave.toString(), (data(loop*range), data((loop+1)*range)))
+        this.partition.put(slave.toString(), (data(loop*range -1), data((loop+1)*range -1)))
       } 
       loop +=1
     }
@@ -132,10 +137,11 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
     override def sendData(req : SendDataRequest) = {
       Master.logger.info("recup data from " + req.ipAddress)
       // do we have to restart the clientLatch 
-      clientLatch.countDown()
+      clientLatchSendData.countDown()
       addData(req.data.toByteArray(),req.ipAddress)
+      clientLatchSendData.await()
+      Master.logger.info("Thread : "+ Thread.currentThread().getName() + "is running")
       // what to do if a new client send data
-      clientLatch.await()
       // we have to reply with partition
       val temp :Map[String,Part] = createPartition().map(x=>(x._1,Part(lowerbound = ByteString.copyFrom(x._2._1),upperbound = ByteString.copyFrom(x._2._2))))
       val reply = SendDataResponse(ok = true, partition = temp.toMap)
