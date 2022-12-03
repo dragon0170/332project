@@ -86,7 +86,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) { self =>
   private def createPartition(): Map[String, (Array[Byte], Array[Byte])] = {
     assert(this.count == this.numClient)
     var mindata : Array[Byte] = Array(0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte)
-    var maxdata : Array[Byte] = Array(-128.toByte,-128.toByte,-128.toByte,-128.toByte,-128.toByte,-128.toByte,-128.toByte,-128.toByte,-128.toByte,-128.toByte)
+    var maxdata : Array[Byte] = Array(-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte)
     // we first need to sort the data list
     this.data = this.data.sorted(KeyOrdering)
     // then we can create the partiton
