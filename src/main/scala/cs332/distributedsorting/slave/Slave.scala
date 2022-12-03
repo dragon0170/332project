@@ -10,10 +10,13 @@ import cs332.distributedsorting.sorting.{HandshakeRequest, SortingGrpc, SendData
 import cs332.distributedsorting.sorting.SortingGrpc.SortingBlockingStub
 
 object Slave {
-  def apply(host: String, port: Int): Slave = {
+
+  private val logger = Logger.getLogger(classOf[Slave].getName)
+  // had name parameter for debugging purpose
+  def apply(host: String, port: Int, name : String): Slave = {
     val channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[_]].build
     val blockingStub = SortingGrpc.blockingStub(channel)
-    new Slave(channel, blockingStub)
+    new Slave(channel, blockingStub,name)
   }
 
   def main(args: Array[String]): Unit = {
@@ -21,9 +24,9 @@ object Slave {
     if (masterEndpoint.isEmpty)
       System.out.println("Master ip:port argument is empty.")
     else {
-      System.out.println("Try to handshake with master: " + masterEndpoint.get)
+      Slave.logger.info("Try to handshake with master: " + masterEndpoint.get)
       val splitedEndpoint = masterEndpoint.get.split(':')
-      val client = Slave(splitedEndpoint(0), splitedEndpoint(1).toInt)
+      val client = Slave(splitedEndpoint(0), splitedEndpoint(1).toInt, "localhost")
       try {
         client.handshake()
       }
@@ -33,7 +36,7 @@ object Slave {
           return
         }
       }
-      System.out.println("handshake")
+      Slave.logger.info("handshake")
         // suppose args(1) is  the path to data file generated with gensort
       val path = args.lastOption
       if (path.isEmpty){
@@ -41,11 +44,9 @@ object Slave {
         client.shutdown()
       }
       else{
-        System.out.println("Try to send data to master")
-        val fSource = Source.fromFile(path.get)
-        val keyList = fSource.grouped(100).toList.map(x=>x.dropRight(90)).take(10).map(x=>x.map(y=>y.toByte)).flatten.toArray
+        Slave.logger.info("Try to send data to master")
         try{
-          client.sendData(keyList)
+          client.sendData(path.get)
         }finally{
         client.shutdown()
         }
@@ -57,7 +58,8 @@ object Slave {
 
 class Slave private(
   private val channel: ManagedChannel,
-  private val blockingStub: SortingBlockingStub
+  private val blockingStub: SortingBlockingStub,
+  val name :String
 )
  {
   var partition: Map[String, (Array[Byte], Array[Byte])] = Map.empty
@@ -68,7 +70,8 @@ class Slave private(
   }
 
   def handshake(): Unit = {
-    val request = HandshakeRequest(ipAddress = getMyIpAddress)
+    val request = HandshakeRequest(ipAddress = this.name)
+    //val request = HandshakeRequest(ipAddress = getMyIpAddress)
     try {
       val response = blockingStub.handshake(request)
       logger.info("Handshake: " + response.ok)
@@ -79,17 +82,20 @@ class Slave private(
       }
   }
 
-  def sendData(data :Array[Byte]) : Unit = {
-    val request = SendDataRequest(ipAddress = getMyIpAddress, data = ByteString.copyFrom(data))
-    System.out.println("we have send data")
+  def sendData(path : String) : Unit = {
+    val fSource = Source.fromFile(path)
+    val data = fSource.grouped(100).toList.map(x=>x.dropRight(90)).take(10).map(x=>x.map(y=>y.toByte)).flatten.toArray
+    val request = SendDataRequest(ipAddress = this.name, data = ByteString.copyFrom(data))
+    //val request = SendDataRequest(ipAddress = getMyIpAddress, data = ByteString.copyFrom(data))
+    Slave.logger.info("we have send data")
     try {
       val response: SendDataResponse = blockingStub.sendData(request)
       if (response.ok){
         this.partition = response.partition.map(x=> (x._1, (x._2.lowerbound.toByteArray(), x._2.upperbound.toByteArray())))
-        System.out.println(partition)
+        System.out.println(partition.map(x=> (x._1,(x._2._1.toList, x._2._2.toList))))
       }
       else {
-        logger.info("master does not succeed to create a partition")
+        Slave.logger.info("master does not succeed to create a partition")
       }
     }
     catch {
