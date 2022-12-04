@@ -212,3 +212,37 @@ Not much progress than previous week because of the last assignment.
 
 - Add test code for partitioning job and merge the partitioning pull request
 - Review the detailed design of distributed sort
+
+---
+
+### Progress of week 7
+
+- Design and review the distributed sorting system
+  - [https://github.com/dragon0170/332project/issues/9](https://github.com/dragon0170/332project/issues/9)
+  - Add detailed message protocol and add skeleton code for entire process
+- Add test code for partitioning task
+  - [https://github.com/dragon0170/332project/pull/5](https://github.com/dragon0170/332project/pull/5)
+
+### Goal of week 8, 최규용
+
+- Resolve merge conflicts and merge the pull request of partitioning task
+- Implement sorting stage as described in design document
+- Implement merging stage as described in design document
+- Last meeting at saturday afternoon
+  - merge all pull requests
+  - do integration tests with docker
+  - fix bugs
+
+### Goal of week 8, 김수빈
+
+- Not attended at weekly meeting and no response from kakaotalk
+- (TBD)Finish implementing external sorting
+- (TBD)Last meeting at saturday afternoon
+
+### Goal of week 8, Mathis
+
+- Implement shuffling stage as described in design document
+- Last meeting at saturday afternoon
+  - merge all pull requests
+  - do integration tests with docker
+  - fix bugs
