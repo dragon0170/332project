@@ -3,10 +3,11 @@ package cs332.distributedsorting.master
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.common.Util.getMyIpAddress
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, Part, SendDataRequest, SendDataResponse, SortingGrpc}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SortingGrpc}
 import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
 import cs332.distributedsorting.master.SortingStates.{Handshaking, Initial, Sampling, Sorting, SortingState}
+import cs332.distributedsorting.sorting.SendSampledDataResponse.KeyRanges
 
 import scala.collection.mutable.Map
 import java.util.concurrent.CountDownLatch
@@ -31,6 +32,7 @@ class SlaveClient(val id: Int, val ip: String) {
   var keyStart: Array[Byte] = _
   var keyEnd: Array[Byte] = _
   var serverPort: Int = _
+  var gotSampledData: Boolean = false
   override def toString: String = ip
 }
 
@@ -44,9 +46,8 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
   private var clientLatch: CountDownLatch = _
   var state: SortingState = Initial
   var slaves: Vector[SlaveClient] = Vector.empty
-  var data : List[Array[Byte]] = Nil
-  var partition : Map[String,(Array[Byte], Array[Byte])] = Map.empty
-  var count = 0
+  var sampledKeyData: List[Array[Byte]] = Nil
+  var idToKeyRanges: Map[Int, KeyRanges] = Map.empty
 
   def start(): Unit = {
     server = ServerBuilder.forPort(Master.port).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
@@ -78,6 +79,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
   def transitionToSorting(): Unit = {
     logger.info("Transition to sorting")
     assert(this.state == Sampling)
+    this.clientLatch.await()
     this.clientLatch = new CountDownLatch(this.numClient)
     this.state = Sorting
   }
@@ -116,46 +118,50 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     System.out.println(this.slaves.mkString(", "))
   }
 
-  private def addData(data_ : Array[Byte],ipAddress : String) : Boolean = {
+  private def addSampledData(id: Int, sampledData : Array[Byte]): Unit = {
     this.synchronized({
-      /*if (this.slaves.toList.filter(x =>x.ip == ipAddress).isEmpty)
-      Master.logger.info("we receive data from a client we did not register")
-        return false*/
-      this.count +=1
-      this.data = this.data ++ data_.grouped(10).toList
-      if(this.count == numClient)
-        logger.info("we receive all the data")
-      return true
+      val slave = this.slaves.find(_.id == id).get
+      assert(!slave.gotSampledData)
+      slave.gotSampledData = true
+
+      this.sampledKeyData = this.sampledKeyData ++ sampledData.grouped(10).toList
+      if (this.slaves.count(_.gotSampledData) == this.numClient) {
+        logger.info("we receive all the sampled data")
+        createPartition()
+        Future {
+          transitionToSampling()
+        }
+      }
     })
   }
 
-  private def createPartition(): Map[String, (Array[Byte], Array[Byte])] = {
-    assert(this.count == this.numClient)
-    var mindata : Array[Byte] = Array(0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte,0.toByte)
-    var maxdata : Array[Byte] = Array(-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte,-1.toByte)
-    // we first need to sort the data list
-    this.data = this.data.sorted(KeyOrdering)
-    // then we can create the partiton
-    if (this.count == 1){
-      this.partition.put(slaves(0).toString(), (mindata, maxdata))
-    }
-    else {
-      val range:Int =(data.length/this.count) 
+  private def createPartition(): Unit = {
+    val mindata: Array[Byte] = Array(Byte.MinValue, Byte.MinValue, Byte.MinValue, Byte.MinValue, Byte.MinValue, Byte.MinValue, Byte.MinValue, Byte.MinValue, Byte.MinValue, Byte.MinValue)
+    val maxdata: Array[Byte] = Array(Byte.MaxValue, Byte.MaxValue, Byte.MaxValue, Byte.MaxValue, Byte.MaxValue, Byte.MaxValue, Byte.MaxValue, Byte.MaxValue, Byte.MaxValue, Byte.MaxValue)
+    val sortedKeyData = this.sampledKeyData.sorted(KeyOrdering)
+
+    val partition: Map[Int,(Array[Byte], Array[Byte])] = Map.empty
+    if (this.slaves.length == 1) {
+      partition.put(slaves(0).id, (mindata, maxdata))
+    } else {
+      val range: Int = sortedKeyData.length / this.slaves.length
       var loop = 0
-      for (slave <- this.slaves.toList){
-        if (loop == 0){
-          this.partition.put(slave.toString(), (mindata, this.data((loop+1)*range -1)))
-        }
-        else if (loop == count-1){
-          this.partition.put(slave.toString(), (data((loop)*range), maxdata))
-        }
-        else{
-          this.partition.put(slave.toString(), (data(loop*range), data((loop+1)*range -1)))
+      for (slave <- this.slaves.toList) {
+        if (loop == 0) {
+          val bytes = sortedKeyData((loop + 1) * range).clone()
+          bytes.update(9, bytes(9).-(1).toByte)
+          partition.put(slave.id, (mindata, bytes))
+        } else if (loop == this.slaves.length - 1) {
+          partition.put(slave.id, (sortedKeyData(loop * range), maxdata))
+        } else {
+          val bytes = sortedKeyData((loop + 1) * range).clone()
+          bytes.update(9, bytes(9).-(1).toByte)
+          partition.put(slave.id, (sortedKeyData(loop * range), bytes))
         } 
         loop +=1
       }
     }
-    return this.partition
+    this.idToKeyRanges = partition.map(x=>(x._1, KeyRanges(lowerBound = ByteString.copyFrom(x._2._1), upperBound = ByteString.copyFrom(x._2._2))))
   }
 
   private class SortingImpl extends SortingGrpc.Sorting {
@@ -168,19 +174,14 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       val reply = HandshakeResponse(ok = true, id = slaveId)
       Future.successful(reply)
     }
-    override def sendData(req : SendDataRequest) = {
+    override def sendSampledData(req : SendSampledDataRequest) = {
       assert(self.state == Sampling)
-      logger.info("recup data from " + req.ipAddress)
-      addData(req.data.toByteArray(),req.ipAddress)
+      logger.info("sampled data from " + req.id)
+      addSampledData(req.id, req.data.toByteArray)
       clientLatch.countDown()
       clientLatch.await()
-      logger.info("Thread : "+ Thread.currentThread().getName() + "is running")
-      // what to do if a new client send data
-      // we have to reply with partition
-      val temp :Map[String,Part] = createPartition().map(x=>(x._1,Part(lowerbound = ByteString.copyFrom(x._2._1),upperbound = ByteString.copyFrom(x._2._2))))
-      val reply = SendDataResponse(ok = true, partition = temp.toMap)
+      val reply = SendSampledDataResponse(ok = true, idToKeyRanges = self.idToKeyRanges.toMap)
       Future.successful(reply)
-
     }
   }
 

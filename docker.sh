@@ -1,5 +1,9 @@
 #!/bin/bash
 
+docker-compose down -v
+
+docker build . --platform linux/amd64 -f gensort.Dockerfile -t gensort:0.1
+
 sbt docker:stage
 cp target/docker/stage/Dockerfile target/docker/stage/master
 cp target/docker/stage/Dockerfile target/docker/stage/slave

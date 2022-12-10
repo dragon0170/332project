@@ -5,17 +5,19 @@ import cs332.distributedsorting.common.Util.getMyIpAddress
 import java.util.concurrent.TimeUnit
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{ManagedChannel, ManagedChannelBuilder}
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendDataRequest, SortingGrpc}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SortingGrpc}
 import cs332.distributedsorting.sorting.SortingGrpc.SortingStub
 
 import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.{Duration}
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
 import scala.io.Source
 import com.google.protobuf.ByteString
 import org.apache.commons.cli.{DefaultParser, Option, Options}
+
+import java.io.File
 
 object Slave {
   def apply(host: String, port: Int, inputDirectories: Array[String], outputDirectory: String): Slave = {
@@ -67,8 +69,10 @@ class Slave private(
   private val inputDirectories: Array[String],
   private val outputDirectory: String,
 ) extends Logging {
+  class KeyRange(val lowerBound: Array[Byte], val upperBound: Array[Byte]) {}
+
   val done: Promise[Boolean] = Promise[Boolean]()
-  var partition: Map[String, (Array[Byte], Array[Byte])] = Map.empty
+  var idToKeyRange: Map[Int, KeyRange] = Map.empty
   var id: Int = 0
 
   def shutdown(): Unit = {
@@ -96,25 +100,34 @@ class Slave private(
 
     logger.info("Handshake succeeded. slave id: " + response.id)
     this.id = response.id
+    val sampledData = getSampledData
+    sendSampledData(sampledData)
   }
 
-  def sendData(path : String) : Unit = {
-    val fSource = Source.fromFile(path)
-    val data = fSource.grouped(100).toList.map(x=>x.dropRight(90)).take(10).map(x=>x.map(y=>y.toByte)).flatten.toArray
-    val request = SendDataRequest(ipAddress = "temp", data = ByteString.copyFrom(data))
-    logger.info("we have send data")
-    val response = stub.sendData(request)
-    response.onComplete {
-      case Success(value) => {
-        if (value.ok) {
-          this.partition = value.partition.map(x => (x._1, (x._2.lowerbound.toByteArray(), x._2.upperbound.toByteArray())))
-          System.out.println(partition.map(x => (x._1, (x._2._1.toList, x._2._2.toList))))
-        } else {
-          logger.error("create partition failed")
-        }
-      }
-      case Failure(exception) => logger.error(s"RPC failed: ${exception}")
-    }
+  def getSampledData: Array[Byte] = {
+    val concatenatedData = inputDirectories
+      .map(new File(_))
+      .flatMap(_.listFiles.filter(_.isFile))
+      .map(Source.fromFile(_))
+      .flatMap(_.grouped(100).toList.map(x => x.dropRight(90)).take(10000).flatMap(x => x.map(y => y.toByte)).toArray)
+    logger.info(s"concatenated data: ${concatenatedData.mkString("Array(", ", ", ")")}")
+    concatenatedData
+  }
 
+  def sendSampledData(data: Array[Byte]) : Unit = {
+    val request = SendSampledDataRequest(id = this.id, data = ByteString.copyFrom(data))
+    logger.info("we have send data")
+    val response = stub.sendSampledData(request)
+    response.onComplete {
+      case Success(value) => handleSendSampledDataResponse(value)
+      case Failure(exception) => logger.error(s"sendSampledData failed: ${exception}")
+    }
+  }
+
+  def handleSendSampledDataResponse(response: SendSampledDataResponse): Unit = {
+    assert(response.ok)
+
+    logger.info(s"Send Sampled Data succeeded. id to key ranges: ${response.idToKeyRanges.map(entry => (entry._1, (entry._2.lowerBound.toByteArray.toList, entry._2.upperBound.toByteArray.toList)))}")
+    this.idToKeyRange = response.idToKeyRanges.map(entry => (entry._1, new KeyRange(lowerBound = entry._2.lowerBound.toByteArray, upperBound = entry._2.upperBound.toByteArray)))
   }
 }
