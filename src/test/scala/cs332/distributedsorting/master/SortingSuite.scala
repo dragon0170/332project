@@ -37,7 +37,7 @@ class SortingSuite extends AnyFunSuite {
 
   // TODO: refactor test
   ignore("3 slaves SendData to master"){
-    val slaves = List[Slave](Slave("localhost", 5133, inputDirectories, outputDirectory), Slave("localhost", 5133,"2", inputDirectories, outputDirectory), Slave("localhost",5133,"3", inputDirectories, outputDirectory))
+    val slaves = List[Slave](Slave("localhost", 5133, inputDirectories, outputDirectory), Slave("localhost", 5133, inputDirectories, outputDirectory), Slave("localhost",5133, inputDirectories, outputDirectory))
     try{
       val handshakeFuture = for (slave <- slaves) yield Future{
         slave.handshake()
