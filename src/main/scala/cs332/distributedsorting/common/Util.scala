@@ -11,3 +11,14 @@ object Util {
     } finally if (socket != null) socket.close()
   }
 }
+
+object KeyOrdering extends Ordering[Array[Byte]]{
+  override def compare(a:Array[Byte], b: Array[Byte]):Int ={
+		assert(a.length == b.length)
+		for (i<- 0 to 9 ){
+			if(a(i)>b(i)) return 1
+			if(a(i) < b(i)) return -1
+		}
+		return 0
+  }
+}

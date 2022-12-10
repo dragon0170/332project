@@ -1,27 +1,58 @@
 version: '3.8'
 
 services:
+  populate_volume:
+    image: gensort:0.1
+    volumes:
+      - gensort_vol:/files
+    platform: linux/amd64
   master:
     image: master:0.1
     command:
       - "3"
     expose:
       - "50051"
+    depends_on:
+      populate_volume:
+        condition: service_completed_successfully
   slave1:
     image: slave:0.1
     command:
       - "master:50051"
+      - "-I"
+      - "/files/input_dir1"
+      - "/files/input_dir2"
+      - "-O"
+      - "/files/output_slave_1"
+    volumes:
+      - gensort_vol:/files
     depends_on:
       - master
   slave2:
     image: slave:0.1
     command:
       - "master:50051"
+      - "-I"
+      - "/files/input_dir3"
+      - "/files/input_dir4"
+      - "-O"
+      - "/files/output_slave_2"
     depends_on:
       - master
+    volumes:
+      - gensort_vol:/files
   slave3:
     image: slave:0.1
     command:
       - "master:50051"
+      - "-I"
+      - "/files/input_dir5"
+      - "/files/input_dir6"
+      - "-O"
+      - "/files/output_slave_3"
+    volumes:
+      - gensort_vol:/files
     depends_on:
       - master
+volumes:
+  gensort_vol:

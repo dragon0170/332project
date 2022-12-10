@@ -4,6 +4,21 @@ package cs332.distributedsorting;
 
 service Sorting {
   rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
+  rpc SendSampledData (SendSampledDataRequest) returns (SendSampledDataResponse){}
+}
+
+message SendSampledDataRequest {
+  int32 id= 1;
+  bytes data = 2;
+}
+
+message SendSampledDataResponse {
+  message KeyRanges {
+    bytes lower_bound = 1;
+    bytes upper_bound = 2;
+  }
+  bool ok = 1;
+  map<int32, KeyRanges> id_to_key_ranges = 2;
 }
 
 message HandshakeRequest {
@@ -12,4 +27,5 @@ message HandshakeRequest {
 
 message HandshakeResponse {
   bool ok = 1;
+  int32 id = 2;
 }
