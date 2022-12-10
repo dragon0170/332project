@@ -4,15 +4,21 @@ import cs332.distributedsorting.common.Util.getMyIpAddress
 
 import java.util.concurrent.TimeUnit
 import org.apache.logging.log4j.scala.Logging
-import io.grpc.{ManagedChannel, ManagedChannelBuilder, StatusRuntimeException}
+import io.grpc.{ManagedChannel, ManagedChannelBuilder}
 import cs332.distributedsorting.sorting.{HandshakeRequest, SortingGrpc}
-import cs332.distributedsorting.sorting.SortingGrpc.SortingBlockingStub
+import cs332.distributedsorting.sorting.SortingGrpc.SortingStub
+
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationInt
+import scala.language.postfixOps
+import scala.util.{Failure, Success}
 
 object Slave {
   def apply(host: String, port: Int): Slave = {
     val channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().asInstanceOf[ManagedChannelBuilder[_]].build
-    val blockingStub = SortingGrpc.blockingStub(channel)
-    new Slave(channel, blockingStub)
+    val stub = SortingGrpc.stub(channel)
+    new Slave(channel, stub)
   }
 
   def main(args: Array[String]): Unit = {
@@ -33,7 +39,7 @@ object Slave {
 
 class Slave private(
   private val channel: ManagedChannel,
-  private val blockingStub: SortingBlockingStub
+  private val stub: SortingStub,
 ) extends Logging {
 
   def shutdown(): Unit = {
@@ -42,14 +48,12 @@ class Slave private(
 
   def handshake(): Unit = {
     val request = HandshakeRequest(ipAddress = getMyIpAddress)
-    try {
-      val response = blockingStub.handshake(request)
-      logger.info("Handshake: " + response.ok)
+    val response = stub.handshake(request)
+    response.onComplete {
+      case Success(value) => logger.info("Handshake succeeded: " + value.ok)
+      case Failure(exception) => logger.error("Handshake failed: " + exception)
     }
-    catch {
-      case e: StatusRuntimeException =>
-        logger.warn(s"RPC failed: ${e.getStatus}")
-    }
+    Await.ready(response, 10 seconds)
   }
 }
 

@@ -31,7 +31,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
   private val clientLatch: CountDownLatch = new CountDownLatch(numClient)
   var slaves: Vector[SlaveClient] = Vector.empty
 
-  private def start(): Unit = {
+  def start(): Unit = {
     server = ServerBuilder.forPort(Master.port).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
     logger.info("Server numClient: " + self.numClient)
     logger.info("Server started, listening on " + Master.port)
@@ -46,7 +46,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     System.out.println(getMyIpAddress + ":" + Master.port)
   }
 
-  private def stop(): Unit = {
+  def stop(): Unit = {
     if (server != null) {
       server.shutdown()
     }

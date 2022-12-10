@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  master:
+    image: master:0.1
+    command:
+      - "3"
+    expose:
+      - "50051"
+  slave1:
+    image: slave:0.1
+    command:
+      - "master:50051"
+    depends_on:
+      - master
+  slave2:
+    image: slave:0.1
+    command:
+      - "master:50051"
+    depends_on:
+      - master
+  slave3:
+    image: slave:0.1
+    command:
+      - "master:50051"
+    depends_on:
+      - master
