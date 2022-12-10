@@ -129,7 +129,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
         logger.info("we receive all the sampled data")
         createPartition()
         Future {
-          transitionToSampling()
+          transitionToSorting()
         }
       }
     })

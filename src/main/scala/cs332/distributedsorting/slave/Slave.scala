@@ -10,14 +10,15 @@ import cs332.distributedsorting.sorting.SortingGrpc.SortingStub
 
 import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration}
+import scala.concurrent.duration.Duration
 import scala.language.postfixOps
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Random, Success}
 import scala.io.Source
 import com.google.protobuf.ByteString
+import cs332.distributedsorting.common.{KeyOrdering}
 import org.apache.commons.cli.{DefaultParser, Option, Options}
 
-import java.io.File
+import java.io.{File, FileOutputStream}
 
 object Slave {
   def apply(host: String, port: Int, inputDirectories: Array[String], outputDirectory: String): Slave = {
@@ -119,7 +120,10 @@ class Slave private(
     logger.info("we have send data")
     val response = stub.sendSampledData(request)
     response.onComplete {
-      case Success(value) => handleSendSampledDataResponse(value)
+      case Success(value) => {
+        handleSendSampledDataResponse(value)
+        sortFilesWithKeyRanges()
+      }
       case Failure(exception) => logger.error(s"sendSampledData failed: ${exception}")
     }
   }
@@ -129,5 +133,59 @@ class Slave private(
 
     logger.info(s"Send Sampled Data succeeded. id to key ranges: ${response.idToKeyRanges.map(entry => (entry._1, (entry._2.lowerBound.toByteArray.toList, entry._2.upperBound.toByteArray.toList)))}")
     this.idToKeyRange = response.idToKeyRanges.map(entry => (entry._1, new KeyRange(lowerBound = entry._2.lowerBound.toByteArray, upperBound = entry._2.upperBound.toByteArray)))
+  }
+
+  def sortFilesWithKeyRanges() = {
+    val data = loadUnsortedFiles()
+    for (d <- data) {
+      val sortedResult = sort(d)
+      saveWithKeyRanges(sortedResult)
+    }
+  }
+
+  def loadUnsortedFiles(): List[Source] = {
+    val unsortedFiles = inputDirectories
+      .map(new File(_))
+      .flatMap(_.listFiles.filter(_.isFile))
+      .map(Source.fromFile(_))
+      .toList
+    unsortedFiles
+  }
+
+  class SortEntry(val key: Array[Byte], val value: Array[Byte]) {}
+
+  def sort(data: Source): List[SortEntry] = {
+    data.grouped(100).toList
+      .map(line => {
+        val (key, value) = line.splitAt(10)
+        new SortEntry(key.map(_.toByte).toArray, value.map(_.toByte).toArray)
+      })
+      .sortBy(_.key)(KeyOrdering)
+  }
+
+  def saveWithKeyRanges(sortedResult: List[SortEntry]): Unit = {
+    val idToKeyIter = this.idToKeyRange.iterator
+    var (id, keyRange) = idToKeyIter.next()
+    var filename = s"${this.outputDirectory}/${id}_${Random.alphanumeric.take(10).mkString}"
+//    logger.info(s"filename: ${filename}")
+    var file = new File(filename)
+    var outputStream = new FileOutputStream(file)
+
+    for (result <- sortedResult) {
+      if (KeyOrdering.compare(result.key, keyRange.upperBound) > 0) {
+        outputStream.close()
+        val (newId, newKeyRange) = idToKeyIter.next()
+        id = newId
+        keyRange = newKeyRange
+        filename = s"${this.outputDirectory}/${id}_${Random.alphanumeric.take(10).mkString}"
+//        logger.info(s"filename: ${filename}")
+        file = new File(filename)
+        outputStream = new FileOutputStream(file)
+      }
+      outputStream.write(result.key)
+      outputStream.write(result.value)
+    }
+
+    outputStream.close()
   }
 }
