@@ -3,9 +3,11 @@ syntax = "proto3";
 package cs332.distributedsorting;
 
 service Sorting {
-  rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
-}
+  //rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
+  rpc SetSlaveServerPort (SetSlaveServerPortRequest) returns (SetSlaveServerPortResponse) {}
 
+}
+/*  handshake*/
 message HandshakeRequest {
   string ipAddress = 1;
 }
@@ -13,3 +15,36 @@ message HandshakeRequest {
 message HandshakeResponse {
   bool ok = 1;
 }
+/*end handshake*/
+
+
+/*shuffling*/
+
+message SetSlaveServerPortRequest {
+	int32 id = 1;
+	int32 port = 2;
+}
+
+message SetSlaveServerPortResponse {
+	bool ok = 1;
+	map<int32, string> id_to_server_endpoint = 2;
+}
+
+// service for slave server
+service Shuffling {
+	rpc SendSortedFiles (stream SendSortedFileRequest) returns (stream SendSortedFileResponse) {}
+}
+
+message SendSortedFileRequest {
+	bytes file = 1;
+}
+
+message SendSortedFileResponse {
+	bool ok = 1;
+}
+
+message KeyRanges {
+	bytes lower_bound = 1;
+	bytes upper_bound = 2;
+}
+/* end shuffling*/

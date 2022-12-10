@@ -1,0 +1,1177 @@
+{
+    "version": "1.4.0",
+    "project": {
+        "name": "root-test",
+        "directory": "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project",
+        "workspaceDir": "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project",
+        "sources": [
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/src/test/scala",
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/src/test/scala-2.13",
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/src/test/scala-2",
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/src/test/java",
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/src/test/protobuf",
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/target/scala-2.13/src_managed/test"
+        ],
+        "dependencies": [
+            "root"
+        ],
+        "classpath": [
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/.bloop/root/scala-2.13/classes",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.13/0.11.11/scalapb-runtime_2.13-0.11.11.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-netty/1.46.0/grpc-netty-1.46.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime-grpc_2.13/0.11.11/scalapb-runtime-grpc_2.13-0.11.11.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api-scala_2.13/12.0/log4j-api-scala_2.13-12.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.19.0/log4j-core-2.19.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest_2.13/3.2.14/scalatest_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.13/0.11.11/lenses_2.13-0.11.11.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.2/protobuf-java-3.19.2.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.7.0/scala-collection-compat_2.13-2.7.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-core/1.46.0/grpc-core-1.46.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-http2/4.1.72.Final/netty-codec-http2-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-handler-proxy/4.1.72.Final/netty-handler-proxy-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/guava/31.0.1-android/guava-31.0.1-android.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.10.0/error_prone_annotations-2.10.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/perfmark/perfmark-api/0.25.0/perfmark-api-0.25.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-stub/1.46.0/grpc-stub-1.46.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-protobuf/1.46.0/grpc-protobuf-1.46.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.10/scala-reflect-2.13.10.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.19.0/log4j-api-2.19.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-core_2.13/3.2.14/scalatest-core_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-featurespec_2.13/3.2.14/scalatest-featurespec_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-flatspec_2.13/3.2.14/scalatest-flatspec_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-freespec_2.13/3.2.14/scalatest-freespec_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funsuite_2.13/3.2.14/scalatest-funsuite_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funspec_2.13/3.2.14/scalatest-funspec_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-propspec_2.13/3.2.14/scalatest-propspec_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-refspec_2.13/3.2.14/scalatest-refspec_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-wordspec_2.13/3.2.14/scalatest-wordspec_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-diagrams_2.13/3.2.14/scalatest-diagrams_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-matchers-core_2.13/3.2.14/scalatest-matchers-core_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-shouldmatchers_2.13/3.2.14/scalatest-shouldmatchers_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-mustmatchers_2.13/3.2.14/scalatest-mustmatchers_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-api/1.46.0/grpc-api-1.46.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.8.9/gson-2.8.9.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/android/annotations/4.1.1.4/annotations-4.1.1.4.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/codehaus/mojo/animal-sniffer-annotations/1.19/animal-sniffer-annotations-1.19.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-common/4.1.72.Final/netty-common-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-buffer/4.1.72.Final/netty-buffer-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-transport/4.1.72.Final/netty-transport-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec/4.1.72.Final/netty-codec-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-handler/4.1.72.Final/netty-handler-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-http/4.1.72.Final/netty-codec-http-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-socks/4.1.72.Final/netty-codec-socks-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-compat-qual/2.5.5/checker-compat-qual-2.5.5.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/api/grpc/proto-google-common-protos/2.0.1/proto-google-common-protos-2.0.1.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-protobuf-lite/1.46.0/grpc-protobuf-lite-1.46.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-compatible/3.2.14/scalatest-compatible-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalactic/scalactic_2.13/3.2.14/scalactic_2.13-3.2.14.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.1.0/scala-xml_2.13-2.1.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-context/1.46.0/grpc-context-1.46.0.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-resolver/4.1.72.Final/netty-resolver-4.1.72.Final.jar",
+            "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-tcnative-classes/2.0.46.Final/netty-tcnative-classes-2.0.46.Final.jar"
+        ],
+        "out": "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/.bloop/root",
+        "classesDir": "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/.bloop/root/scala-2.13/test-classes",
+        "resources": [
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/src/test/resources",
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/src/test/protobuf",
+            "/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project/target/scala-2.13/resource_managed/test"
+        ],
+        "scala": {
+            "organization": "org.scala-lang",
+            "name": "scala-compiler",
+            "version": "2.13.10",
+            "options": [
+                
+            ],
+            "jars": [
+                "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar",
+                "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.10/scala-compiler-2.13.10.jar",
+                "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.10/scala-reflect-2.13.10.jar",
+                "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.12/java-diff-utils-4.12.jar",
+                "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.21.0/jline-3.21.0.jar",
+                "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/5.9.0/jna-5.9.0.jar"
+            ],
+            "setup": {
+                "order": "mixed",
+                "addLibraryToBootClasspath": true,
+                "addCompilerToClasspath": false,
+                "addExtraJarsToClasspath": false,
+                "manageBootClasspath": true,
+                "filterLibraryFromClasspath": true
+            }
+        },
+        "java": {
+            "options": [
+                
+            ]
+        },
+        "test": {
+            "frameworks": [
+                {
+                    "names": [
+                        "org.scalacheck.ScalaCheckFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "org.specs2.runner.Specs2Framework",
+                        "org.specs2.runner.SpecsFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "org.specs.runner.SpecsFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "org.scalatest.tools.Framework",
+                        "org.scalatest.tools.ScalaTestFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "com.novocode.junit.JUnitFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "munit.Framework"
+                    ]
+                }
+            ],
+            "options": {
+                "excludes": [
+                    
+                ],
+                "arguments": [
+                    
+                ]
+            }
+        },
+        "platform": {
+            "name": "jvm",
+            "config": {
+                "home": "/Users/mathisayma_1/.jabba/jdk/adopt@1.11.0-11/Contents/Home",
+                "options": [
+                    "-Duser.dir=/Users/mathisayma_1/SoftwareDesignMethods/shuffling_332project/332project"
+                ]
+            },
+            "mainClass": [
+                
+            ]
+        },
+        "resolution": {
+            "modules": [
+                {
+                    "organization": "org.scala-lang",
+                    "name": "scala-library",
+                    "version": "2.13.10",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scala-library",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar"
+                        },
+                        {
+                            "name": "scala-library",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.thesamet.scalapb",
+                    "name": "scalapb-runtime_2.13",
+                    "version": "0.11.11",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalapb-runtime_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.13/0.11.11/scalapb-runtime_2.13-0.11.11.jar"
+                        },
+                        {
+                            "name": "scalapb-runtime_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.13/0.11.11/scalapb-runtime_2.13-0.11.11-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.grpc",
+                    "name": "grpc-netty",
+                    "version": "1.46.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "grpc-netty",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-netty/1.46.0/grpc-netty-1.46.0.jar"
+                        },
+                        {
+                            "name": "grpc-netty",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-netty/1.46.0/grpc-netty-1.46.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.thesamet.scalapb",
+                    "name": "scalapb-runtime-grpc_2.13",
+                    "version": "0.11.11",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalapb-runtime-grpc_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime-grpc_2.13/0.11.11/scalapb-runtime-grpc_2.13-0.11.11.jar"
+                        },
+                        {
+                            "name": "scalapb-runtime-grpc_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime-grpc_2.13/0.11.11/scalapb-runtime-grpc_2.13-0.11.11-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.logging.log4j",
+                    "name": "log4j-api-scala_2.13",
+                    "version": "12.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "log4j-api-scala_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api-scala_2.13/12.0/log4j-api-scala_2.13-12.0.jar"
+                        },
+                        {
+                            "name": "log4j-api-scala_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api-scala_2.13/12.0/log4j-api-scala_2.13-12.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.thesamet.scalapb",
+                    "name": "lenses_2.13",
+                    "version": "0.11.11",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "lenses_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.13/0.11.11/lenses_2.13-0.11.11.jar"
+                        },
+                        {
+                            "name": "lenses_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.13/0.11.11/lenses_2.13-0.11.11-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.protobuf",
+                    "name": "protobuf-java",
+                    "version": "3.19.2",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "protobuf-java",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.2/protobuf-java-3.19.2.jar"
+                        },
+                        {
+                            "name": "protobuf-java",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.2/protobuf-java-3.19.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scala-lang.modules",
+                    "name": "scala-collection-compat_2.13",
+                    "version": "2.7.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scala-collection-compat_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.7.0/scala-collection-compat_2.13-2.7.0.jar"
+                        },
+                        {
+                            "name": "scala-collection-compat_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.7.0/scala-collection-compat_2.13-2.7.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.grpc",
+                    "name": "grpc-core",
+                    "version": "1.46.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "grpc-core",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-core/1.46.0/grpc-core-1.46.0.jar"
+                        },
+                        {
+                            "name": "grpc-core",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-core/1.46.0/grpc-core-1.46.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-codec-http2",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-codec-http2",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-http2/4.1.72.Final/netty-codec-http2-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-codec-http2",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-http2/4.1.72.Final/netty-codec-http2-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-handler-proxy",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-handler-proxy",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-handler-proxy/4.1.72.Final/netty-handler-proxy-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-handler-proxy",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-handler-proxy/4.1.72.Final/netty-handler-proxy-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.guava",
+                    "name": "guava",
+                    "version": "31.0.1-android",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "guava",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/guava/31.0.1-android/guava-31.0.1-android.jar"
+                        },
+                        {
+                            "name": "guava",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/guava/31.0.1-android/guava-31.0.1-android-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.errorprone",
+                    "name": "error_prone_annotations",
+                    "version": "2.10.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "error_prone_annotations",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.10.0/error_prone_annotations-2.10.0.jar"
+                        },
+                        {
+                            "name": "error_prone_annotations",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.10.0/error_prone_annotations-2.10.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.perfmark",
+                    "name": "perfmark-api",
+                    "version": "0.25.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "perfmark-api",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/perfmark/perfmark-api/0.25.0/perfmark-api-0.25.0.jar"
+                        },
+                        {
+                            "name": "perfmark-api",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/perfmark/perfmark-api/0.25.0/perfmark-api-0.25.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.grpc",
+                    "name": "grpc-stub",
+                    "version": "1.46.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "grpc-stub",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-stub/1.46.0/grpc-stub-1.46.0.jar"
+                        },
+                        {
+                            "name": "grpc-stub",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-stub/1.46.0/grpc-stub-1.46.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.grpc",
+                    "name": "grpc-protobuf",
+                    "version": "1.46.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "grpc-protobuf",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-protobuf/1.46.0/grpc-protobuf-1.46.0.jar"
+                        },
+                        {
+                            "name": "grpc-protobuf",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-protobuf/1.46.0/grpc-protobuf-1.46.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scala-lang",
+                    "name": "scala-reflect",
+                    "version": "2.13.10",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scala-reflect",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.10/scala-reflect-2.13.10.jar"
+                        },
+                        {
+                            "name": "scala-reflect",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.10/scala-reflect-2.13.10-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.grpc",
+                    "name": "grpc-api",
+                    "version": "1.46.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "grpc-api",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-api/1.46.0/grpc-api-1.46.0.jar"
+                        },
+                        {
+                            "name": "grpc-api",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-api/1.46.0/grpc-api-1.46.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.code.gson",
+                    "name": "gson",
+                    "version": "2.8.9",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "gson",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.8.9/gson-2.8.9.jar"
+                        },
+                        {
+                            "name": "gson",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.8.9/gson-2.8.9-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.android",
+                    "name": "annotations",
+                    "version": "4.1.1.4",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "annotations",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/android/annotations/4.1.1.4/annotations-4.1.1.4.jar"
+                        },
+                        {
+                            "name": "annotations",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/android/annotations/4.1.1.4/annotations-4.1.1.4-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.codehaus.mojo",
+                    "name": "animal-sniffer-annotations",
+                    "version": "1.19",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "animal-sniffer-annotations",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/codehaus/mojo/animal-sniffer-annotations/1.19/animal-sniffer-annotations-1.19.jar"
+                        },
+                        {
+                            "name": "animal-sniffer-annotations",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/codehaus/mojo/animal-sniffer-annotations/1.19/animal-sniffer-annotations-1.19-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-common",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-common",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-common/4.1.72.Final/netty-common-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-common",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-common/4.1.72.Final/netty-common-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-buffer",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-buffer",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-buffer/4.1.72.Final/netty-buffer-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-buffer",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-buffer/4.1.72.Final/netty-buffer-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-transport",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-transport",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-transport/4.1.72.Final/netty-transport-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-transport",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-transport/4.1.72.Final/netty-transport-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-codec",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-codec",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec/4.1.72.Final/netty-codec-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-codec",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec/4.1.72.Final/netty-codec-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-handler",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-handler",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-handler/4.1.72.Final/netty-handler-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-handler",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-handler/4.1.72.Final/netty-handler-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-codec-http",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-codec-http",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-http/4.1.72.Final/netty-codec-http-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-codec-http",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-http/4.1.72.Final/netty-codec-http-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-codec-socks",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-codec-socks",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-socks/4.1.72.Final/netty-codec-socks-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-codec-socks",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-codec-socks/4.1.72.Final/netty-codec-socks-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.guava",
+                    "name": "failureaccess",
+                    "version": "1.0.1",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "failureaccess",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar"
+                        },
+                        {
+                            "name": "failureaccess",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.guava",
+                    "name": "listenablefuture",
+                    "version": "9999.0-empty-to-avoid-conflict-with-guava",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "listenablefuture",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.code.findbugs",
+                    "name": "jsr305",
+                    "version": "3.0.2",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "jsr305",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar"
+                        },
+                        {
+                            "name": "jsr305",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.checkerframework",
+                    "name": "checker-qual",
+                    "version": "3.12.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "checker-qual",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0.jar"
+                        },
+                        {
+                            "name": "checker-qual",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-qual/3.12.0/checker-qual-3.12.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.checkerframework",
+                    "name": "checker-compat-qual",
+                    "version": "2.5.5",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "checker-compat-qual",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-compat-qual/2.5.5/checker-compat-qual-2.5.5.jar"
+                        },
+                        {
+                            "name": "checker-compat-qual",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-compat-qual/2.5.5/checker-compat-qual-2.5.5-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.j2objc",
+                    "name": "j2objc-annotations",
+                    "version": "1.3",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "j2objc-annotations",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar"
+                        },
+                        {
+                            "name": "j2objc-annotations",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.api.grpc",
+                    "name": "proto-google-common-protos",
+                    "version": "2.0.1",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "proto-google-common-protos",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/api/grpc/proto-google-common-protos/2.0.1/proto-google-common-protos-2.0.1.jar"
+                        },
+                        {
+                            "name": "proto-google-common-protos",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/api/grpc/proto-google-common-protos/2.0.1/proto-google-common-protos-2.0.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.grpc",
+                    "name": "grpc-protobuf-lite",
+                    "version": "1.46.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "grpc-protobuf-lite",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-protobuf-lite/1.46.0/grpc-protobuf-lite-1.46.0.jar"
+                        },
+                        {
+                            "name": "grpc-protobuf-lite",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-protobuf-lite/1.46.0/grpc-protobuf-lite-1.46.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.grpc",
+                    "name": "grpc-context",
+                    "version": "1.46.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "grpc-context",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-context/1.46.0/grpc-context-1.46.0.jar"
+                        },
+                        {
+                            "name": "grpc-context",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/grpc/grpc-context/1.46.0/grpc-context-1.46.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-resolver",
+                    "version": "4.1.72.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-resolver",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-resolver/4.1.72.Final/netty-resolver-4.1.72.Final.jar"
+                        },
+                        {
+                            "name": "netty-resolver",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-resolver/4.1.72.Final/netty-resolver-4.1.72.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-tcnative-classes",
+                    "version": "2.0.46.Final",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "netty-tcnative-classes",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-tcnative-classes/2.0.46.Final/netty-tcnative-classes-2.0.46.Final.jar"
+                        },
+                        {
+                            "name": "netty-tcnative-classes",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-tcnative-classes/2.0.46.Final/netty-tcnative-classes-2.0.46.Final-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.logging.log4j",
+                    "name": "log4j-core",
+                    "version": "2.19.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "log4j-core",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.19.0/log4j-core-2.19.0.jar"
+                        },
+                        {
+                            "name": "log4j-core",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/2.19.0/log4j-core-2.19.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.logging.log4j",
+                    "name": "log4j-api",
+                    "version": "2.19.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "log4j-api",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.19.0/log4j-api-2.19.0.jar"
+                        },
+                        {
+                            "name": "log4j-api",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.19.0/log4j-api-2.19.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scala-lang",
+                    "name": "scala-library",
+                    "version": "2.13.10",
+                    "configurations": "optional",
+                    "artifacts": [
+                        {
+                            "name": "scala-library",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10.jar"
+                        },
+                        {
+                            "name": "scala-library",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.10/scala-library-2.13.10-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest_2.13/3.2.14/scalatest_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest_2.13/3.2.14/scalatest_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-core_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-core_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-core_2.13/3.2.14/scalatest-core_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-core_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-core_2.13/3.2.14/scalatest-core_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-featurespec_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-featurespec_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-featurespec_2.13/3.2.14/scalatest-featurespec_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-featurespec_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-featurespec_2.13/3.2.14/scalatest-featurespec_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-flatspec_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-flatspec_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-flatspec_2.13/3.2.14/scalatest-flatspec_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-flatspec_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-flatspec_2.13/3.2.14/scalatest-flatspec_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-freespec_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-freespec_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-freespec_2.13/3.2.14/scalatest-freespec_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-freespec_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-freespec_2.13/3.2.14/scalatest-freespec_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-funsuite_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-funsuite_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funsuite_2.13/3.2.14/scalatest-funsuite_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-funsuite_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funsuite_2.13/3.2.14/scalatest-funsuite_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-funspec_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-funspec_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funspec_2.13/3.2.14/scalatest-funspec_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-funspec_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funspec_2.13/3.2.14/scalatest-funspec_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-propspec_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-propspec_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-propspec_2.13/3.2.14/scalatest-propspec_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-propspec_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-propspec_2.13/3.2.14/scalatest-propspec_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-refspec_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-refspec_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-refspec_2.13/3.2.14/scalatest-refspec_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-refspec_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-refspec_2.13/3.2.14/scalatest-refspec_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-wordspec_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-wordspec_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-wordspec_2.13/3.2.14/scalatest-wordspec_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-wordspec_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-wordspec_2.13/3.2.14/scalatest-wordspec_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-diagrams_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-diagrams_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-diagrams_2.13/3.2.14/scalatest-diagrams_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-diagrams_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-diagrams_2.13/3.2.14/scalatest-diagrams_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-matchers-core_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-matchers-core_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-matchers-core_2.13/3.2.14/scalatest-matchers-core_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-matchers-core_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-matchers-core_2.13/3.2.14/scalatest-matchers-core_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-shouldmatchers_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-shouldmatchers_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-shouldmatchers_2.13/3.2.14/scalatest-shouldmatchers_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-shouldmatchers_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-shouldmatchers_2.13/3.2.14/scalatest-shouldmatchers_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-mustmatchers_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-mustmatchers_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-mustmatchers_2.13/3.2.14/scalatest-mustmatchers_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-mustmatchers_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-mustmatchers_2.13/3.2.14/scalatest-mustmatchers_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalatest",
+                    "name": "scalatest-compatible",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalatest-compatible",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-compatible/3.2.14/scalatest-compatible-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalatest-compatible",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-compatible/3.2.14/scalatest-compatible-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scalactic",
+                    "name": "scalactic_2.13",
+                    "version": "3.2.14",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scalactic_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalactic/scalactic_2.13/3.2.14/scalactic_2.13-3.2.14.jar"
+                        },
+                        {
+                            "name": "scalactic_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalactic/scalactic_2.13/3.2.14/scalactic_2.13-3.2.14-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.scala-lang.modules",
+                    "name": "scala-xml_2.13",
+                    "version": "2.1.0",
+                    "configurations": "default",
+                    "artifacts": [
+                        {
+                            "name": "scala-xml_2.13",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.1.0/scala-xml_2.13-2.1.0.jar"
+                        },
+                        {
+                            "name": "scala-xml_2.13",
+                            "classifier": "sources",
+                            "path": "/Users/mathisayma_1/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.1.0/scala-xml_2.13-2.1.0-sources.jar"
+                        }
+                    ]
+                }
+            ]
+        },
+        "tags": [
+            "test"
+        ]
+    }
+}
