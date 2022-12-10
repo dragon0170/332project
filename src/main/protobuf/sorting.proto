@@ -29,4 +29,5 @@ message HandshakeRequest {
 
 message HandshakeResponse {
   bool ok = 1;
+  int32 id = 2;
 }

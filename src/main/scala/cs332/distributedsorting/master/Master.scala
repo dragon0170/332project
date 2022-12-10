@@ -3,12 +3,14 @@ package cs332.distributedsorting.master
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.common.Util.getMyIpAddress
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SortingGrpc, SendDataRequest, SendDataResponse, Part}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, Part, SendDataRequest, SendDataResponse, SortingGrpc}
 import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
-import scala.collection.mutable.Map
+import cs332.distributedsorting.master.SortingStates.{Handshaking, Initial, Sampling, Sorting, SortingState}
 
+import scala.collection.mutable.Map
 import java.util.concurrent.CountDownLatch
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 object Master {
@@ -26,13 +28,21 @@ object Master {
 }
 
 class SlaveClient(val id: Int, val ip: String) {
+  var keyStart: Array[Byte] = _
+  var keyEnd: Array[Byte] = _
+  var serverPort: Int = _
   override def toString: String = ip
+}
+
+object SortingStates extends Enumeration {
+  type SortingState = Value
+  val Initial, Handshaking, Sampling, Sorting, Shuffling, Merging, End = Value
 }
 
 class Master(executionContext: ExecutionContext, val numClient: Int) extends Logging { self =>
   private[this] var server: Server = null
-  private val clientLatchSendData :CountDownLatch = new CountDownLatch(numClient)
-  private val clientLatch: CountDownLatch = new CountDownLatch(numClient)
+  private var clientLatch: CountDownLatch = _
+  var state: SortingState = Initial
   var slaves: Vector[SlaveClient] = Vector.empty
   var data : List[Array[Byte]] = Nil
   var partition : Map[String,(Array[Byte], Array[Byte])] = Map.empty
@@ -47,6 +57,29 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       self.stop()
       System.err.println("*** server shut down")
     }
+    transitionToHandshaking()
+  }
+
+  def transitionToHandshaking(): Unit = {
+    logger.info("Transition to handshaking")
+    assert(this.state == Initial)
+    this.clientLatch = new CountDownLatch(this.numClient)
+    this.state = Handshaking
+  }
+
+  def transitionToSampling(): Unit = {
+    logger.info("Transition to sampling")
+    assert(this.state == Handshaking)
+    this.clientLatch.await()
+    this.clientLatch = new CountDownLatch(this.numClient)
+    this.state = Sampling
+  }
+
+  def transitionToSorting(): Unit = {
+    logger.info("Transition to sorting")
+    assert(this.state == Sampling)
+    this.clientLatch = new CountDownLatch(this.numClient)
+    this.state = Sorting
   }
 
   private def printEndpoint(): Unit = {
@@ -65,10 +98,17 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     }
   }
 
-  private def addNewSlave(ipAddress: String): Unit = {
+  private def addNewSlave(ipAddress: String): Int = {
     this.synchronized {
+      val slaveId = this.slaves.length
       this.slaves = this.slaves :+ new SlaveClient(this.slaves.length, ipAddress)
-      if (this.slaves.length == this.numClient) printSlaveIpAddresses()
+      if (this.slaves.length == this.numClient) {
+        printSlaveIpAddresses()
+        Future {
+          transitionToSampling()
+        }
+      }
+      slaveId
     }
   }
 
@@ -120,18 +160,20 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
 
   private class SortingImpl extends SortingGrpc.Sorting {
     override def handshake(req: HandshakeRequest) = {
+      assert(self.state == Handshaking)
       logger.info("Handshake from " + req.ipAddress)
+      val slaveId = addNewSlave(req.ipAddress)
       clientLatch.countDown()
-      addNewSlave(req.ipAddress)
       clientLatch.await()
-      val reply = HandshakeResponse(ok = true)
+      val reply = HandshakeResponse(ok = true, id = slaveId)
       Future.successful(reply)
     }
     override def sendData(req : SendDataRequest) = {
+      assert(self.state == Sampling)
       logger.info("recup data from " + req.ipAddress)
       addData(req.data.toByteArray(),req.ipAddress)
-      clientLatchSendData.countDown()
-      clientLatchSendData.await()
+      clientLatch.countDown()
+      clientLatch.await()
       logger.info("Thread : "+ Thread.currentThread().getName() + "is running")
       // what to do if a new client send data
       // we have to reply with partition
