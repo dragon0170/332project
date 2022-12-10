@@ -4,6 +4,23 @@ package cs332.distributedsorting;
 
 service Sorting {
   rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
+  rpc SendData(SendDataRequest) returns (SendDataResponse){}
+}
+
+message SendDataRequest{
+  bytes data = 1;
+  string ipAddress= 2;
+}
+
+message Part {
+  bytes lowerbound = 1; // corresponds to Array of Bytes
+  bytes upperbound = 2; // corresponds to Array of Bytes
+}
+
+message SendDataResponse{
+  bool ok = 1;
+  map<string,Part> partition = 2;
+
 }
 
 message HandshakeRequest {
