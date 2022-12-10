@@ -11,17 +11,32 @@ services:
     image: slave:0.1
     command:
       - "master:50051"
+      - "-I"
+      - "test/input1"
+      - "test/input2"
+      - "-O"
+      - "test/output"
     depends_on:
       - master
   slave2:
     image: slave:0.1
     command:
       - "master:50051"
+      - "-I"
+      - "test/input1"
+      - "test/input2"
+      - "-O"
+      - "test/output"
     depends_on:
       - master
   slave3:
     image: slave:0.1
     command:
       - "master:50051"
+      - "-I"
+      - "test/input1"
+      - "test/input2"
+      - "-O"
+      - "test/output"
     depends_on:
       - master
