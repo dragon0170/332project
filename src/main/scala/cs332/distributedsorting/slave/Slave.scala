@@ -24,6 +24,7 @@ import java.io.InputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.io.FileOutputStream
+import java.{util => ju}
 
 object Slave {
   def apply(host: String, port: Int, inputDirectories: Array[String], outputDirectory: String): Slave = {
@@ -152,9 +153,10 @@ class Slave private(
 
   def handleSendNumFilesResponse(response: SendNumFilesResponse): Unit = {
     // check if ok is true
+    assert(response.ok)
     val files = getSortedFiles() // get sorted files in output directory with slave id prefix
     externalSort(files, response.startIndex, response.length) // do external sort with files and save with filename of partition.{index}. index starts from startIndex and increases
-    notifyMergingCompleted()
+    //notifyMergingCompleted()
   }
 
 
@@ -182,8 +184,10 @@ class Slave private(
   
 
   def getSortedFiles() : List[File] = {
-    val file = new File(outputDirectory)
-    return file.listFiles().filter(_.isFile()).toList
+    (for (inputDirectory <- this.inputDirectories
+    )yield{
+      new File(inputDirectory).listFiles().filter(_.isFile()).toList
+    }).toList.flatten
   }
 
 
