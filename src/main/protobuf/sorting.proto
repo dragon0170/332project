@@ -6,6 +6,8 @@ service Sorting {
   rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
   rpc SendSampledData (SendSampledDataRequest) returns (SendSampledDataResponse){}
   rpc SetSlaveServerPort (SetSlaveServerPortRequest) returns (SetSlaveServerPortResponse) {}
+  rpc SendNumFiles (SendNumFilesRequest) returns (SendNumFilesResponse) {}
+  rpc NotifyMergingCompleted (NotifyMergingCompletedRequest) returns (NotifyMergingCompletedResponse) {}
 }
 
 message SendSampledDataRequest {
@@ -39,6 +41,25 @@ message SetSlaveServerPortRequest {
 message SetSlaveServerPortResponse {
   bool ok = 1;
   map<int32, string> id_to_server_endpoint = 2;
+}
+
+message SendNumFilesRequest {
+  int32 id = 1;
+  int32 num = 2;
+}
+
+message SendNumFilesResponse {
+  bool ok = 1;
+  int32 startIndex = 2;
+  int32 length = 3;
+}
+
+message NotifyMergingCompletedRequest {
+  int32 id = 1;
+}
+
+message NotifyMergingCompletedResponse {
+  bool ok = 1;
 }
 
 // service for slave server

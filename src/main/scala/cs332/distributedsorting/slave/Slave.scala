@@ -1,13 +1,15 @@
 package cs332.distributedsorting.slave
 
+import com.google.code.externalsorting.ExternalSort
 import cs332.distributedsorting.common.Util.getMyIpAddress
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{ManagedChannel, ManagedChannelBuilder, Server, ServerBuilder}
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SendSortedFileRequest, SendSortedFileResponse, SetSlaveServerPortRequest, SetSlaveServerPortResponse, ShufflingGrpc, SortingGrpc}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, NotifyMergingCompletedRequest, SendNumFilesRequest, SendNumFilesResponse, SendSampledDataRequest, SendSampledDataResponse, SendSortedFileRequest, SendSortedFileResponse, SetSlaveServerPortRequest, SetSlaveServerPortResponse, ShufflingGrpc, SortingGrpc}
 import cs332.distributedsorting.sorting.SortingGrpc.SortingStub
 
+import scala.collection.JavaConverters._
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -15,12 +17,14 @@ import scala.language.postfixOps
 import scala.util.{Failure, Random, Success}
 import scala.io.Source
 import com.google.protobuf.ByteString
-import cs332.distributedsorting.common.KeyOrdering
+import cs332.distributedsorting.common.{KeyComparator, KeyOrdering}
 import io.grpc.stub.StreamObserver
 import org.apache.commons.cli.{DefaultParser, Option, Options}
 
-import java.io.{File, FileOutputStream}
+import java.io.{File, FileOutputStream, IOException, InputStream}
 import java.net.ServerSocket
+import java.nio.charset.Charset
+import java.nio.file.Files
 import java.util.concurrent.locks.ReentrantLock
 
 object Slave {
@@ -155,6 +159,7 @@ class Slave private(
     for (d <- data) {
       val sortedResult = sort(d)
       saveWithKeyRanges(sortedResult)
+      d.close()
     }
   }
 
@@ -182,7 +187,6 @@ class Slave private(
     val idToKeyIter = this.idToKeyRange.iterator
     var (id, keyRange) = idToKeyIter.next()
     var filename = s"${this.outputDirectory}/${id}_${Random.alphanumeric.take(10).mkString}"
-//    logger.info(s"filename: ${filename}")
     var file = new File(filename)
     var outputStream = new FileOutputStream(file)
 
@@ -193,7 +197,6 @@ class Slave private(
         id = newId
         keyRange = newKeyRange
         filename = s"${this.outputDirectory}/${id}_${Random.alphanumeric.take(10).mkString}"
-//        logger.info(s"filename: ${filename}")
         file = new File(filename)
         outputStream = new FileOutputStream(file)
       }
@@ -231,6 +234,7 @@ class Slave private(
       case Success(value) => {
         handleSetSlaveServerPortResponse(value)
         shuffleSortedFiles()
+        sendNumFiles()
       }
       case Failure(exception) => logger.error("SetSlaveServerPort failed: " + exception)
     }
@@ -267,7 +271,10 @@ class Slave private(
         }
       })
       for (file <- files) {
-        requestObserver.onNext(SendSortedFileRequest(file = ByteString.copyFrom(file.toList.map(x => x.toByte).toArray)))
+        val source = Source.fromFile(file)
+        requestObserver.onNext(SendSortedFileRequest(file = ByteString.copyFrom(source.toList.map(x => x.toByte).toArray)))
+        source.close()
+        file.delete()
         sendLatch.await()
         sendLatch = new CountDownLatch(1)
       }
@@ -277,12 +284,12 @@ class Slave private(
     }
   }
 
-  def getAllFilesOfId(id: Int): List[Source] = {
+  def getAllFilesOfId(id: Int): List[File] = {
     val sortedFiles = new File(outputDirectory)
       .listFiles
       .filter(_.isFile)
       .filter(_.getName.startsWith(s"${id}_"))
-      .map(Source.fromFile(_))
+//      .map(Source.fromFile(_))
       .toList
     sortedFiles
   }
@@ -308,11 +315,135 @@ class Slave private(
   }
 
   def saveSortedFile(file: Array[Byte]): Unit = {
-    val filename = s"${this.outputDirectory}/${this.id}_${Random.alphanumeric.take(10).mkString}_shuffled"
+    val filename = s"${this.outputDirectory}/${this.id}_${Random.alphanumeric.take(10).mkString}"
     logger.info(s"save received file: $filename")
     val newFile = new File(filename)
     val outputStream = new FileOutputStream(newFile)
     outputStream.write(file)
     outputStream.close()
+  }
+
+  def getNumberOfFiles: Int = {
+    val numberOfFiles = inputDirectories
+      .map(new File(_))
+      .flatMap(_.listFiles.filter(_.isFile))
+      .length
+    numberOfFiles
+  }
+
+  def sendNumFiles(): Unit = {
+    val num = getNumberOfFiles
+    val request = SendNumFilesRequest(id = this.id, num = num)
+    val response = stub.sendNumFiles(request)
+    response.onComplete {
+      case Success(value) => {
+        handleSendNumFilesResponse(value)
+      }
+      case Failure(exception) => logger.error("SendNumFiles failed: " + exception)
+    }
+  }
+
+  def handleSendNumFilesResponse(response: SendNumFilesResponse): Unit = {
+    assert(response.ok)
+    val files = getSortedFiles
+//    files.foreach(file => logger.info(s"${file.length()}"))
+    // do external sort with files and save with filename of partition.{index}. index starts from startIndex and increases
+    externalSort(files, response.startIndex, response.length)
+     notifyMergingCompleted()
+  }
+
+  def getSortedFiles: List[File] = {
+    new File(outputDirectory)
+      .listFiles()
+      .filter(_.isFile())
+      .filter(_.getName.startsWith(s"${id}_"))
+      .toList
+  }
+
+  def externalSort(files: List[File], startIndex: Int, length: Int): Any = {
+    // merge all files in one, and then split them in [length] files
+    val filename = s"${this.outputDirectory}/mergedOneFile"
+    val outputFile = new File(filename)
+//    logger.info(Charset.forName("US-ASCII").toString)
+    val result = ExternalSort.mergeSortedFiles(files.asJava, outputFile, KeyComparator, Charset.forName("US-ASCII"))
+    logger.info(s"external sort result: $result")
+
+    // Now we split the temporarySortedFile in length new sorted files
+    val lastIndexOfFileCreated = splitFile(outputFile, getSizeInBytes(outputFile.length(), length), startIndex)
+    assert(lastIndexOfFileCreated == startIndex + length)
+    outputFile.delete()
+    addCarriageReturn()
+    logger.info("finish external sort")
+  }
+
+  def splitFile(largeFile: File, sizeOfNewFile: Int, startIndex: Int): Int = {
+    var indexOfFile: Int = startIndex
+    try {
+      val in: InputStream = Files.newInputStream(largeFile.toPath())
+      val buffer: Array[Byte] = new Array[Byte](sizeOfNewFile);
+      var dataRead: Int = in.read(buffer, 0, sizeOfNewFile);
+      while (dataRead > -1) {
+        createNewFile(indexOfFile, buffer)
+        indexOfFile += 1;
+        dataRead = in.read(buffer, 0, sizeOfNewFile);
+      }
+    } catch {
+      case e: IOException => logger.error(s"fail to splitFile: ${e.toString}")
+    }
+
+    indexOfFile
+  }
+
+  def createNewFile(index: Int, buffer: Array[Byte]): Unit = {
+    val sortedFile: File = new File(s"$outputDirectory/pre_partition.${index}")
+    try {
+      val output: FileOutputStream = new FileOutputStream(sortedFile)
+      output.write(buffer)
+    } catch {
+      case e: IOException => logger.error(s"fail to create File: ${e.toString}")
+    }
+  }
+
+  def getSizeInBytes(totalBytes: Long, numberOfFiles: Int): Int = {
+    var temp = totalBytes
+    if (totalBytes % numberOfFiles != 0) {
+      temp = ((totalBytes / numberOfFiles) + 1) * numberOfFiles
+    }
+    val x: Long = temp / numberOfFiles
+    if (x > Integer.MAX_VALUE) {
+      throw new NumberFormatException("Byte chunk too large");
+    }
+    x.asInstanceOf[Int]
+  }
+
+  def addCarriageReturn(): Unit = {
+    val partitionedFiles = new File(outputDirectory)
+      .listFiles
+      .filter(_.isFile)
+      .filter(_.getName.startsWith("pre_partition"))
+      .toList
+    for (file <- partitionedFiles) {
+      val source = Source.fromFile(file)
+      val filename = s"${this.outputDirectory}/${file.getName.drop(4)}"
+      val newFile = new File(filename)
+      val outputStream = new FileOutputStream(newFile)
+      for (editedLine <- source.grouped(99).toList.map(line => line.patch(98, Array('\r'), 0))) {
+        outputStream.write(editedLine.map(_.toByte).toArray)
+      }
+      outputStream.close()
+      source.close()
+      file.delete()
+    }
+  }
+
+  def notifyMergingCompleted(): Unit = {
+    val request = NotifyMergingCompletedRequest(id = this.id)
+    val response = stub.notifyMergingCompleted(request)
+    response.onComplete {
+      case Success(value) =>
+        assert(value.ok)
+        this.done.success(true)
+      case Failure(exception) => logger.error("notifyMerging failed : " + exception)
+    }
   }
 }

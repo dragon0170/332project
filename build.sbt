@@ -16,7 +16,8 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" %% "log4j-api-scala" % "12.0",
   "org.apache.logging.log4j" % "log4j-core" % "2.19.0" % Runtime,
   "org.scalatest" %% "scalatest" % "3.2.14" % "test",
-  "commons-cli" % "commons-cli" % "1.5.0"
+  "commons-cli" % "commons-cli" % "1.5.0",
+  "com.google.code.externalsortinginjava" % "externalsortinginjava" % "0.6.1"
 )
 
 Compile / PB.targets := Seq(
