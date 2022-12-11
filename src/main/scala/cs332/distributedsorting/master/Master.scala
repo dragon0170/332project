@@ -62,7 +62,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int, val port: I
   var idToEndpoint: Map[Int, String] = Map.empty
 
   def start(): Unit = {
-    server = ServerBuilder.forPort(this.port).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
+    server = ServerBuilder.forPort(this.port).maxInboundMessageSize(100 * 1024 * 1024).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
     logger.info("Server numClient: " + self.numClient)
     logger.info("Server started, listening on " + this.port)
     sys.addShutdownHook {

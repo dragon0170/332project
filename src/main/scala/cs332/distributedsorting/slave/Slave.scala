@@ -208,7 +208,7 @@ class Slave private(
   def startGrpcServer(): Unit = {
     this.serverPort = findRandomAvailablePort
     // start grpc server with Shuffling service and save opened port to serverPort variable
-    slaveServer = ServerBuilder.forPort(this.serverPort).addService(ShufflingGrpc.bindService(new ShufflingImpl, ExecutionContext.global)).build.start
+    slaveServer = ServerBuilder.forPort(this.serverPort).maxInboundMessageSize(100 * 1024 * 1024).addService(ShufflingGrpc.bindService(new ShufflingImpl, ExecutionContext.global)).build.start
     logger.info("Server started, listening on " + this.serverPort.toString())
   }
 
