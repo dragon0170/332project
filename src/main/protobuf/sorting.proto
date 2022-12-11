@@ -5,6 +5,7 @@ package cs332.distributedsorting;
 service Sorting {
   rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
   rpc SendSampledData (SendSampledDataRequest) returns (SendSampledDataResponse){}
+  rpc SetSlaveServerPort (SetSlaveServerPortRequest) returns (SetSlaveServerPortResponse) {}
 }
 
 message SendSampledDataRequest {
@@ -28,4 +29,27 @@ message HandshakeRequest {
 message HandshakeResponse {
   bool ok = 1;
   int32 id = 2;
+}
+
+message SetSlaveServerPortRequest {
+  int32 id = 1;
+  int32 port = 2;
+}
+
+message SetSlaveServerPortResponse {
+  bool ok = 1;
+  map<int32, string> id_to_server_endpoint = 2;
+}
+
+// service for slave server
+service Shuffling {
+  rpc SendSortedFiles (stream SendSortedFileRequest) returns (stream SendSortedFileResponse) {}
+}
+
+message SendSortedFileRequest {
+  bytes file = 1;
+}
+
+message SendSortedFileResponse {
+  bool ok = 1;
 }
