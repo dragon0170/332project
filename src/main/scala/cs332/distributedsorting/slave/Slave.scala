@@ -5,7 +5,7 @@ import cs332.distributedsorting.common.Util.getMyIpAddress
 import java.util.concurrent.TimeUnit
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{ManagedChannel, ManagedChannelBuilder}
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SortingGrpc}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SortingGrpc, SendNumFilesRequest, SendNumFilesResponse, NotifyMergingCompletedRequest, NotifyMergingCompletedResponse}
 import cs332.distributedsorting.sorting.SortingGrpc.SortingStub
 
 import scala.concurrent.{Await, Future, Promise}
@@ -16,8 +16,14 @@ import scala.util.{Failure, Success}
 import scala.io.Source
 import com.google.protobuf.ByteString
 import org.apache.commons.cli.{DefaultParser, Option, Options}
-
+import com.google.code.externalsorting.ExternalSort
+import cs332.distributedsorting.common.KeyComparator
+import scala.collection.JavaConverters._
 import java.io.File
+import java.io.InputStream
+import java.io.IOException
+import java.nio.file.Files
+import java.io.FileOutputStream
 
 object Slave {
   def apply(host: String, port: Int, inputDirectories: Array[String], outputDirectory: String): Slave = {
@@ -130,4 +136,111 @@ class Slave private(
     logger.info(s"Send Sampled Data succeeded. id to key ranges: ${response.idToKeyRanges.map(entry => (entry._1, (entry._2.lowerBound.toByteArray.toList, entry._2.upperBound.toByteArray.toList)))}")
     this.idToKeyRange = response.idToKeyRanges.map(entry => (entry._1, new KeyRange(lowerBound = entry._2.lowerBound.toByteArray, upperBound = entry._2.upperBound.toByteArray)))
   }
+
+
+  def sendNumFiles(): Unit = {
+    val num = getNumberOfFiles()
+    val request = SendNumFilesRequest(id = this.id, num = num)
+    val response = stub.sendNumFiles(request)
+    response.onComplete {
+      case Success(value) => {
+        handleSendNumFilesResponse(value)
+      }
+      case Failure(exception) => logger.error("SendNumFiles failed: " + exception)
+    }
+  }
+
+  def handleSendNumFilesResponse(response: SendNumFilesResponse): Unit = {
+    // check if ok is true
+    val files = getSortedFiles() // get sorted files in output directory with slave id prefix
+    externalSort(files, response.startIndex, response.length) // do external sort with files and save with filename of partition.{index}. index starts from startIndex and increases
+    notifyMergingCompleted()
+  }
+
+
+
+  def notifyMergingCompleted():Unit = {
+    val request = NotifyMergingCompletedRequest(id = this.id)
+    val response = stub.notifyMergingCompleted(request)
+    response.onComplete{
+      case Success(value) => 
+        this.done.success(true)
+      case Failure(exception) => logger.error("notifyMerging failed : " + exception)
+    }
+  }
+
+
+  def getNumberOfFiles():Int = {
+    // get the total number of files in input directory
+    var totalNumberOfFile:Int = 0
+    for (inputDirectory <- this.inputDirectories){
+      val file = new File(inputDirectory)
+      totalNumberOfFile += file.listFiles().filter(_.isFile()).length
+    }
+    return totalNumberOfFile
+  }
+  
+
+  def getSortedFiles() : List[File] = {
+    val file = new File(outputDirectory)
+    return file.listFiles().filter(_.isFile()).toList
+  }
+
+
+
+
+  def externalSort(files : List[File], startIndex : Int, length :Int): Any = {
+    //merge all files in one, and then split them in [length] files
+    val largeSortedFile = new File(outputDirectory + "temporaryFile")
+    ExternalSort.mergeSortedFiles(files.asJava, largeSortedFile,KeyComparator)
+    //Now we split the temporarySortedFile in length new sorted files
+    val nberOfFileCreatesd = splitFile(largeSortedFile, getSizeInBytes(largeSortedFile.length(), length), startIndex)
+    assert(nberOfFileCreatesd == startIndex + length)
+    
+  }
+
+
+  def splitFile(largeFile : File, sizeOfNewFile : Int, startIndex : Int): Int= {
+    var numberOfFiles : Int = startIndex
+    try {val in : InputStream = Files.newInputStream(largeFile.toPath()) 
+        var buffer : Array[Byte] = Array.empty;
+        var dataRead :Int = in.read(buffer,0,sizeOfNewFile);
+        while (dataRead > -1) {
+            createNewFile(numberOfFiles,buffer)
+            numberOfFiles+=1;
+            dataRead = in.read(buffer,0,sizeOfNewFile);
+        }
+    }catch{
+      case e: IOException => logger.info("fail to splitFile")
+    }
+
+    return numberOfFiles
+  }
+
+
+  def createNewFile(index : Int, buffer: Array[Byte]):Unit = {
+    val sortedFile : File = new File(outputDirectory + "partiton."+index.toString)
+    try{
+      val output : FileOutputStream = new FileOutputStream(sortedFile)
+      output.write(buffer)
+      //output.flush()
+    }catch{
+      case e: IOException => logger.info("fail to create File")
+    }
+  }
+
+
+  def getSizeInBytes(totalBytes:Long, numberOfFiles : Int): Int={
+    var temp = totalBytes
+    if (totalBytes % numberOfFiles != 0) {
+        temp = ((totalBytes / numberOfFiles) + 1) * numberOfFiles
+    }
+    val x : Long = temp / numberOfFiles
+    if (x > Integer.MAX_VALUE){
+        throw new NumberFormatException("Byte chunk too large");
+    }
+    return x.asInstanceOf[Int]
+
+  }
+
 }

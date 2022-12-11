@@ -3,7 +3,7 @@ package cs332.distributedsorting.master
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.common.Util.getMyIpAddress
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SortingGrpc}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SortingGrpc, SendNumFilesRequest, SendNumFilesResponse, NotifyMergingCompletedRequest, NotifyMergingCompletedResponse}
 import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
 import cs332.distributedsorting.master.SortingStates.{Handshaking, Initial, Sampling, Sorting, SortingState}
@@ -33,6 +33,9 @@ class SlaveClient(val id: Int, val ip: String) {
   var keyEnd: Array[Byte] = _
   var serverPort: Int = _
   var gotSampledData: Boolean = false
+  var numFile :Int = _
+  var ended : Boolean = false
+
   override def toString: String = ip
 }
 
@@ -164,6 +167,48 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     this.idToKeyRanges = partition.map(x=>(x._1, KeyRanges(lowerBound = ByteString.copyFrom(x._2._1), upperBound = ByteString.copyFrom(x._2._2))))
   }
 
+
+
+  def setNumFiles(id: Int, num: Int):Unit = {
+    // set num files of slave in the internal variable
+    val slave : Option[SlaveClient] = slaves.find(x=>x.id ==id)
+    slave match {
+      case None => logger.info("id does not match ")
+      case Some(value) => value.numFile = num
+    }
+    // if all slaves' num are received, call transitionToEnd function
+
+  }
+
+
+  def getStartIndexAndLength(id: Int) : (Int, Int) = {
+    // calculate start index and length for partitioned sorted files of slave with id
+    val totalFiles :Int = slaves.foldLeft(0)((x,y)=>x+y.numFile)
+    val length : Int = totalFiles/slaves.length
+    if(id == slaves.length -1 && length * slaves.length != totalFiles ){ // we give more files to the last slaves if the totalNumberOfFiles is not a multiple of the number of slaves
+      return (id*length, totalFiles - id*length + 1)
+    }
+    return (id*length,length)
+  }
+
+  def setSortingFinished(id : Int){
+     //mark sorting finished to slave with id
+    val slave : Option[SlaveClient] = slaves.find(x=>x.id ==id)
+    slave match {
+      case None => logger.info("id does not match ")
+      case Some(value) => value.ended = true
+    }
+    if (slaves.forall(x=>x.ended)){
+      server.shutdown()
+      server.awaitTermination()
+    }
+    //// if all slaves are finished, call server.shutdown() and server.awaitTermination()
+  }
+
+
+
+
+
   private class SortingImpl extends SortingGrpc.Sorting {
     override def handshake(req: HandshakeRequest) = {
       assert(self.state == Handshaking)
@@ -183,6 +228,25 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       val reply = SendSampledDataResponse(ok = true, idToKeyRanges = self.idToKeyRanges.toMap)
       Future.successful(reply)
     }
+
+    override def sendNumFiles(req: SendNumFilesRequest) = {
+      // check if current state is merging
+      assert(state == SortingStates.Merging)
+      setNumFiles(req.id, req.num)
+      clientLatch.countDown()
+      clientLatch.await()
+      val (startIndex, length) = getStartIndexAndLength(req.id)
+      val reply = SendNumFilesResponse(ok = true, startIndex = startIndex, length = length)
+      Future.successful(reply)
+    }
+    override def notifyMergingCompleted(req: NotifyMergingCompletedRequest)= {
+      assert(self.state == SortingStates.End)
+      setSortingFinished(req.id)
+      val reply = NotifyMergingCompletedResponse(ok = true)
+      Future.successful(reply)
+    }
+
   }
+  
 
 }
