@@ -14,7 +14,7 @@ class SortingSuite extends AnyFunSuite {
   val outputDirectory = "test/output"
 
   override def withFixture(test: NoArgTest): Outcome = {
-    val master = new Master(ExecutionContext.global, 3)
+    val master = new Master(ExecutionContext.global, 3, 50051)
     master.start()
     try test()
     finally {
