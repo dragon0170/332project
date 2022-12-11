@@ -1,6 +1,6 @@
 package cs332.distributedsorting.common
 
-import java.net.{DatagramSocket, InetAddress}
+import java.net.{DatagramSocket, InetAddress, ServerSocket}
 import java.util.Comparator
 
 object Util {
@@ -10,6 +10,13 @@ object Util {
       socket.connect(InetAddress.getByName("8.8.8.8"), 10002)
       socket.getLocalAddress.getHostAddress
     } finally if (socket != null) socket.close()
+  }
+
+  def findRandomAvailablePort: Int = {
+    val socket = new ServerSocket(0)
+    val availablePort = socket.getLocalPort
+    socket.close()
+    availablePort
   }
 }
 

@@ -2,7 +2,7 @@ package cs332.distributedsorting.master
 
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{Server, ServerBuilder}
-import cs332.distributedsorting.common.Util.getMyIpAddress
+import cs332.distributedsorting.common.Util.{findRandomAvailablePort, getMyIpAddress}
 import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, NotifyMergingCompletedRequest, NotifyMergingCompletedResponse, SendNumFilesRequest, SendNumFilesResponse, SendSampledDataRequest, SendSampledDataResponse, SetSlaveServerPortRequest, SetSlaveServerPortResponse, SortingGrpc}
 import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
@@ -11,7 +11,6 @@ import cs332.distributedsorting.sorting.SendSampledDataResponse.KeyRanges
 
 import scala.collection.mutable.Map
 import java.util.concurrent.CountDownLatch
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 object Master {
@@ -19,13 +18,19 @@ object Master {
     val numClient = args.headOption
     if (numClient.isEmpty) return
 
-    val server = new Master(ExecutionContext.global, numClient.get.toInt)
+    var port: Int = 0
+    args.find(arg => arg == "DEBUG") match {
+      case Some(_) => port = 50051
+      case None => port = Master.randomPort
+    }
+
+    val server = new Master(ExecutionContext.global, numClient.get.toInt, port)
     server.start()
     server.printEndpoint()
     server.blockUntilShutdown()
   }
 
-  private val port = 50051
+  private val randomPort = findRandomAvailablePort
 }
 
 class SlaveClient(val id: Int, val ip: String) {
@@ -44,7 +49,7 @@ object SortingStates extends Enumeration {
   val Initial, Handshaking, Sampling, Sorting, Shuffling, Merging, End = Value
 }
 
-class Master(executionContext: ExecutionContext, val numClient: Int) extends Logging { self =>
+class Master(executionContext: ExecutionContext, val numClient: Int, val port: Int) extends Logging { self =>
   private[this] var server: Server = null
   private val handshakeLatch: CountDownLatch = new CountDownLatch(numClient)
   private val sampleLatch: CountDownLatch = new CountDownLatch(numClient)
@@ -57,9 +62,9 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
   var idToEndpoint: Map[Int, String] = Map.empty
 
   def start(): Unit = {
-    server = ServerBuilder.forPort(Master.port).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
+    server = ServerBuilder.forPort(this.port).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
     logger.info("Server numClient: " + self.numClient)
-    logger.info("Server started, listening on " + Master.port)
+    logger.info("Server started, listening on " + this.port)
     sys.addShutdownHook {
       logger.info("*** shutting down gRPC server since JVM is shutting down")
       self.stop()
@@ -105,7 +110,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
   }
 
   private def printEndpoint(): Unit = {
-    System.out.println(getMyIpAddress + ":" + Master.port)
+    System.out.println(getMyIpAddress + ":" + this.port)
   }
 
   def stop(): Unit = {
