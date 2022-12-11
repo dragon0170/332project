@@ -3,10 +3,10 @@ package cs332.distributedsorting.master
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.common.Util.getMyIpAddress
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SetSlaveServerPortRequest, SetSlaveServerPortResponse, SortingGrpc}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, NotifyMergingCompletedRequest, NotifyMergingCompletedResponse, SendNumFilesRequest, SendNumFilesResponse, SendSampledDataRequest, SendSampledDataResponse, SetSlaveServerPortRequest, SetSlaveServerPortResponse, SortingGrpc}
 import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
-import cs332.distributedsorting.master.SortingStates.{Handshaking, Initial, Merging, Sampling, Shuffling, Sorting, SortingState}
+import cs332.distributedsorting.master.SortingStates.{End, Handshaking, Initial, Merging, Sampling, Shuffling, Sorting, SortingState}
 import cs332.distributedsorting.sorting.SendSampledDataResponse.KeyRanges
 
 import scala.collection.mutable.Map
@@ -33,6 +33,9 @@ class SlaveClient(val id: Int, val ip: String) {
   var keyEnd: Array[Byte] = _
   var serverPort: Int = 0
   var gotSampledData: Boolean = false
+  var numFile: Int = 0
+  var gotNumFile: Boolean = false
+  var ended: Boolean = false
   override def toString: String = ip
 }
 
@@ -58,9 +61,9 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     logger.info("Server numClient: " + self.numClient)
     logger.info("Server started, listening on " + Master.port)
     sys.addShutdownHook {
-      System.err.println("*** shutting down gRPC server since JVM is shutting down")
+      logger.info("*** shutting down gRPC server since JVM is shutting down")
       self.stop()
-      System.err.println("*** server shut down")
+      logger.info("*** server shut down")
     }
     transitionToHandshaking()
   }
@@ -93,6 +96,12 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     logger.info("Transition to merging")
     assert(this.state == Shuffling)
     this.state = Merging
+  }
+
+  def transitionToEnd(): Unit = {
+    logger.info("Transition to end")
+    assert(this.state == Merging)
+    this.state = End
   }
 
   private def printEndpoint(): Unit = {
@@ -199,6 +208,45 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     this.idToEndpoint = idToEndpoint
   }
 
+  def setNumFiles(id: Int, num: Int): Unit = {
+    this.synchronized {
+      val slave: Option[SlaveClient] = slaves.find(x => x.id == id)
+      slave match {
+        case None => logger.error("id does not match")
+        case Some(value) =>
+          value.numFile = num
+          value.gotNumFile = true
+      }
+      if (slaves.forall(x => x.gotNumFile)) {
+        transitionToEnd()
+      }
+    }
+  }
+
+  def getStartIndexAndLength(id: Int): (Int, Int) = {
+    val totalFiles: Int = slaves.foldLeft(0)((x, y) => x + y.numFile)
+    val length: Int = totalFiles / slaves.length
+
+    // we give less files to the last slaves if the totalNumberOfFiles is not a multiple of the number of slaves
+    if (id == slaves.length - 1 && length * slaves.length != totalFiles)
+      (id * length, length + (totalFiles % slaves.length))
+    else
+      (id * length, length)
+  }
+
+  def setSortingFinished(id: Int) {
+    this.synchronized {
+      val slave: Option[SlaveClient] = slaves.find(x => x.id == id)
+      slave match {
+        case None => logger.error("id does not match ")
+        case Some(value) => value.ended = true
+      }
+      if (slaves.forall(x => x.ended)) {
+        server.shutdown()
+      }
+    }
+  }
+
   private class SortingImpl extends SortingGrpc.Sorting {
     override def handshake(req: HandshakeRequest) = {
       assert(self.state == Handshaking)
@@ -226,6 +274,25 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       shuffleLatch.countDown()
       shuffleLatch.await()
       val reply = SetSlaveServerPortResponse(ok = true, idToServerEndpoint = self.idToEndpoint.toMap)
+      Future.successful(reply)
+    }
+
+    override def sendNumFiles(req: SendNumFilesRequest) = {
+      assert(state == SortingStates.Merging)
+      setNumFiles(req.id, req.num)
+      mergeLatch.countDown()
+      mergeLatch.await()
+      val (startIndex, length) = getStartIndexAndLength(req.id)
+      val reply = SendNumFilesResponse(ok = true, startIndex = startIndex, length = length)
+      Future.successful(reply)
+    }
+
+    override def notifyMergingCompleted(req: NotifyMergingCompletedRequest) = {
+      logger.info(s"slave merge completed. id: ${req.id}")
+      assert(self.state == SortingStates.End)
+      setSortingFinished(req.id)
+      val reply = NotifyMergingCompletedResponse(ok = true)
+      logger.info(s"slave merge completed reply. id: ${req.id}")
       Future.successful(reply)
     }
   }
