@@ -10,6 +10,7 @@ services:
     image: master:0.1
     command:
       - "3"
+      - "DEBUG"
     expose:
       - "50051"
     depends_on:

@@ -17,8 +17,25 @@ sbt compile
 sbt stage
 ```
 
+## How to Run Applications
+You have to install first.
+Then, you need to move to installed directory.
+```shell
+cd target/universal/stage/bin/
+```
+Finally, you can run master and slave there.
+```shell
+# Master
+./master <# of workers>
+
+# Slave
+./slave <master IP:port> -I <input directory> <input directory> ... <input directory> -O <output directory> 
+
+```
+
 ## Test
 ### SBT Test
+Not working now. we have to fix it.
 ```shell
 sbt test
 ```

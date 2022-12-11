@@ -1,7 +1,7 @@
 package cs332.distributedsorting.slave
 
 import com.google.code.externalsorting.ExternalSort
-import cs332.distributedsorting.common.Util.getMyIpAddress
+import cs332.distributedsorting.common.Util.{findRandomAvailablePort, getMyIpAddress}
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import org.apache.logging.log4j.scala.Logging
@@ -22,10 +22,8 @@ import io.grpc.stub.StreamObserver
 import org.apache.commons.cli.{DefaultParser, Option, Options}
 
 import java.io.{File, FileOutputStream, IOException, InputStream}
-import java.net.ServerSocket
 import java.nio.charset.Charset
 import java.nio.file.Files
-import java.util.concurrent.locks.ReentrantLock
 
 object Slave {
   def apply(host: String, port: Int, inputDirectories: Array[String], outputDirectory: String): Slave = {
@@ -205,13 +203,6 @@ class Slave private(
     }
 
     outputStream.close()
-  }
-
-  private def findRandomAvailablePort: Int = {
-    val socket = new ServerSocket(0)
-    val availablePort = socket.getLocalPort
-    socket.close()
-    availablePort
   }
 
   def startGrpcServer(): Unit = {
