@@ -396,11 +396,11 @@ class Slave private(
   }
 
   def getSizeInBytes(totalBytes: Long, numberOfFiles: Int): Int = {
-    var temp = totalBytes
-    if (totalBytes % numberOfFiles != 0) {
-      temp = ((totalBytes / numberOfFiles) + 1) * numberOfFiles
+    var temp = totalBytes / 99
+    if ((totalBytes / 99) % numberOfFiles != 0) {
+      temp = (((totalBytes / 99) / numberOfFiles) + 1) * numberOfFiles
     }
-    val x: Long = temp / numberOfFiles
+    val x: Long = (temp / numberOfFiles) * 99
     if (x > Integer.MAX_VALUE) {
       throw new NumberFormatException("Byte chunk too large");
     }
