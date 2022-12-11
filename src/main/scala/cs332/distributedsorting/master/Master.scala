@@ -34,6 +34,7 @@ class SlaveClient(val id: Int, val ip: String) {
   var serverPort: Int = _
   var gotSampledData: Boolean = false
   var numFile :Int = _
+  var send_num_File : Boolean = false
   var ended : Boolean = false
 
   override def toString: String = ip
@@ -86,6 +87,18 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     this.clientLatch = new CountDownLatch(this.numClient)
     this.state = Sorting
   }
+
+  def transitionToEnding():Unit = {
+    logger.info("Transition to ending")
+    assert(this.state == SortingStates.Merging)
+    this.clientLatch.await()
+    this.state = SortingStates.End
+  }
+
+
+
+
+
 
   private def printEndpoint(): Unit = {
     System.out.println(getMyIpAddress + ":" + Master.port)
@@ -174,10 +187,14 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
     val slave : Option[SlaveClient] = slaves.find(x=>x.id ==id)
     slave match {
       case None => logger.info("id does not match ")
-      case Some(value) => value.numFile = num
+      case Some(value) => 
+        value.numFile = num
+        value.send_num_File = true
+    }
+    if (slaves.forall(x=>x.send_num_File)){
+
     }
     // if all slaves' num are received, call transitionToEnd function
-
   }
 
 
