@@ -3,10 +3,10 @@ package cs332.distributedsorting.master
 import org.apache.logging.log4j.scala.Logging
 import io.grpc.{Server, ServerBuilder}
 import cs332.distributedsorting.common.Util.getMyIpAddress
-import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SortingGrpc}
+import cs332.distributedsorting.sorting.{HandshakeRequest, HandshakeResponse, SendSampledDataRequest, SendSampledDataResponse, SetSlaveServerPortRequest, SetSlaveServerPortResponse, SortingGrpc}
 import com.google.protobuf.ByteString
 import cs332.distributedsorting.common.KeyOrdering
-import cs332.distributedsorting.master.SortingStates.{Handshaking, Initial, Sampling, Sorting, SortingState}
+import cs332.distributedsorting.master.SortingStates.{Handshaking, Initial, Merging, Sampling, Shuffling, Sorting, SortingState}
 import cs332.distributedsorting.sorting.SendSampledDataResponse.KeyRanges
 
 import scala.collection.mutable.Map
@@ -31,7 +31,7 @@ object Master {
 class SlaveClient(val id: Int, val ip: String) {
   var keyStart: Array[Byte] = _
   var keyEnd: Array[Byte] = _
-  var serverPort: Int = _
+  var serverPort: Int = 0
   var gotSampledData: Boolean = false
   override def toString: String = ip
 }
@@ -43,11 +43,15 @@ object SortingStates extends Enumeration {
 
 class Master(executionContext: ExecutionContext, val numClient: Int) extends Logging { self =>
   private[this] var server: Server = null
-  private var clientLatch: CountDownLatch = _
+  private val handshakeLatch: CountDownLatch = new CountDownLatch(numClient)
+  private val sampleLatch: CountDownLatch = new CountDownLatch(numClient)
+  private val shuffleLatch: CountDownLatch = new CountDownLatch(numClient)
+  private val mergeLatch: CountDownLatch = new CountDownLatch(numClient)
   var state: SortingState = Initial
   var slaves: Vector[SlaveClient] = Vector.empty
   var sampledKeyData: List[Array[Byte]] = Nil
   var idToKeyRanges: Map[Int, KeyRanges] = Map.empty
+  var idToEndpoint: Map[Int, String] = Map.empty
 
   def start(): Unit = {
     server = ServerBuilder.forPort(Master.port).addService(SortingGrpc.bindService(new SortingImpl, executionContext)).build.start
@@ -64,24 +68,31 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
   def transitionToHandshaking(): Unit = {
     logger.info("Transition to handshaking")
     assert(this.state == Initial)
-    this.clientLatch = new CountDownLatch(this.numClient)
     this.state = Handshaking
   }
 
   def transitionToSampling(): Unit = {
     logger.info("Transition to sampling")
     assert(this.state == Handshaking)
-    this.clientLatch.await()
-    this.clientLatch = new CountDownLatch(this.numClient)
     this.state = Sampling
   }
 
   def transitionToSorting(): Unit = {
     logger.info("Transition to sorting")
     assert(this.state == Sampling)
-    this.clientLatch.await()
-    this.clientLatch = new CountDownLatch(this.numClient)
     this.state = Sorting
+  }
+
+  def transitionToShuffling(): Unit = {
+    logger.info("Transition to shuffling")
+    assert(this.state == Sorting)
+    this.state = Shuffling
+  }
+
+  def transitionToMerging(): Unit = {
+    logger.info("Transition to merging")
+    assert(this.state == Shuffling)
+    this.state = Merging
   }
 
   private def printEndpoint(): Unit = {
@@ -106,9 +117,7 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       this.slaves = this.slaves :+ new SlaveClient(this.slaves.length, ipAddress)
       if (this.slaves.length == this.numClient) {
         printSlaveIpAddresses()
-        Future {
-          transitionToSampling()
-        }
+        transitionToSampling()
       }
       slaveId
     }
@@ -128,9 +137,8 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       if (this.slaves.count(_.gotSampledData) == this.numClient) {
         logger.info("we receive all the sampled data")
         createPartition()
-        Future {
-          transitionToSorting()
-        }
+        transitionToSorting()
+        transitionToShuffling()
       }
     })
   }
@@ -162,6 +170,33 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       }
     }
     this.idToKeyRanges = partition.map(x=>(x._1, KeyRanges(lowerBound = ByteString.copyFrom(x._2._1), upperBound = ByteString.copyFrom(x._2._2))))
+    // We do not need sampled key data anymore, so it can be garbage collected
+    this.sampledKeyData = Nil
+  }
+
+  def setSlavePort(slaveId: Int, serverPort: Int): Unit = {
+    // if all slaves port is received, call transitionToMerging function
+    this.synchronized {
+      slaves.find(p => p.id == slaveId) match {
+        case None => logger.error("id does not match")
+        case Some(value) =>
+          assert(value.serverPort == 0)
+          value.serverPort = serverPort
+      }
+      if (this.slaves.count(_.serverPort != 0) == this.numClient) {
+        logger.info("we receive all the slave port")
+        setIdToEndpoint()
+        transitionToMerging()
+      }
+    }
+  }
+
+  def setIdToEndpoint(): Unit = {
+    for (slave <- slaves) {
+      val ipPort = s"${slave.ip}:${slave.serverPort}"
+      idToEndpoint += (slave.id -> ipPort)
+    }
+    this.idToEndpoint = idToEndpoint
   }
 
   private class SortingImpl extends SortingGrpc.Sorting {
@@ -169,8 +204,8 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       assert(self.state == Handshaking)
       logger.info("Handshake from " + req.ipAddress)
       val slaveId = addNewSlave(req.ipAddress)
-      clientLatch.countDown()
-      clientLatch.await()
+      handshakeLatch.countDown()
+      handshakeLatch.await()
       val reply = HandshakeResponse(ok = true, id = slaveId)
       Future.successful(reply)
     }
@@ -178,9 +213,19 @@ class Master(executionContext: ExecutionContext, val numClient: Int) extends Log
       assert(self.state == Sampling)
       logger.info("sampled data from " + req.id)
       addSampledData(req.id, req.data.toByteArray)
-      clientLatch.countDown()
-      clientLatch.await()
+      sampleLatch.countDown()
+      sampleLatch.await()
       val reply = SendSampledDataResponse(ok = true, idToKeyRanges = self.idToKeyRanges.toMap)
+      Future.successful(reply)
+    }
+
+    override def setSlaveServerPort(req: SetSlaveServerPortRequest): Future[SetSlaveServerPortResponse] = {
+      assert(self.state == Shuffling)
+      logger.info(s"slave server port from ${req.id}, server port: ${req.port}")
+      setSlavePort(req.id, req.port)
+      shuffleLatch.countDown()
+      shuffleLatch.await()
+      val reply = SetSlaveServerPortResponse(ok = true, idToServerEndpoint = self.idToEndpoint.toMap)
       Future.successful(reply)
     }
   }
